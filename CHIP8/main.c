@@ -6,15 +6,9 @@
 //  Copyright © 2016 Valtteri Koskivuori. All rights reserved.
 //
 
-/*
- TODO:
- Add input
- Add output
- Add sleep() to run the emulation loop at 60hz
- */
-
 #include <SDL2/SDL.h>
 #include "CPU.h"
+#include <time.h>
 
 typedef unsigned char byte;
 
@@ -180,7 +174,11 @@ int main(int argc, const char * argv[]) {
 		}
 		
 		setInput();
-		
+		struct timespec ts;
+		int milliseconds = 16;
+		ts.tv_sec = milliseconds / 1000;
+		ts.tv_nsec = (milliseconds % 1000) * 1000000;
+		nanosleep(&ts, NULL);
 	}
 	
 	return 4;

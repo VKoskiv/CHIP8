@@ -105,15 +105,22 @@ void cpu_emulateCycle() {
 		case 0x0000:
 			//In some cases the first 4 bits don't tell us the opcode, in that case check the last 4 bits
 			switch (mainCPU.currentOP & 0x000F) { //Compare the LAST 4 bits
-				case 0x0000: //Must be 0x00E0, which clears the screen
+				case 0x0000: // 0x00E0: Clear the screen
 					//Execute
+					for (int i = 0; i <= sizeof(mainCPU.display); i++) {
+						mainCPU.display[i] = 0x0;
+					}
+					mainCPU.drawFlag = true;
 					break;
-				case 0x000E: //Must be 0x00EE, which returns from subroutine
-					//Execute
+				case 0x000E: // 0x00EE: Return from subroutine
+					mainCPU.progCounter = mainCPU.stack[mainCPU.stackPointer];
+					--mainCPU.stackPointer;
+					mainCPU.progCounter += 2;
 					break;
 					
 				default:
 					printf("Unknown opcode [0x0000]: 0x%X\n", mainCPU.currentOP);
+					abort();
 					break;
 			}
 			break;
@@ -157,12 +164,6 @@ void cpu_emulateCycle() {
 			break;
 			
 		case 0x7000: // 0x7XNN: Add NN to VX
-			//Check for overflow
-			//FIXME: Spec does not tell to set carry flag here, so disable this if it freaks out, probably maybe shouldn't cause trouble?
-			if ((mainCPU.currentOP & 0x00FF) > (0xFF - mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8]))
-				mainCPU.V[0xF] = 1; //Carry
-			else
-				mainCPU.V[0xF] = 0; //No overflow, no carry
 			mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] += (mainCPU.currentOP & 0x00FF);
 			mainCPU.progCounter += 2;
 			break;
@@ -195,16 +196,35 @@ void cpu_emulateCycle() {
 					mainCPU.progCounter += 2;
 					break;
 				case 0x0005: // 0x8XY5: VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't
+					if (mainCPU.V[(mainCPU.currentOP & 0x00F0) >> 4] > mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8])
+						mainCPU.V[0xF] = 0; //There is borrow
+					else
+						mainCPU.V[0xF] = 1; //There is no borrow
+					mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] -= mainCPU.V[(mainCPU.currentOP & 0x00F0) >> 4];
+					mainCPU.progCounter += 2;
 					break;
 				case 0x0006: // 0x8XY6: Shift VX right by one. VF is set to the value of the least significant bit of VX before the shift
+					mainCPU.V[0xF] = mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] & 0x1;
+					mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] >>= 1;
+					mainCPU.progCounter += 2;
 					break;
 				case 0x0007: // 0x8XY7: Set VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't
+					if (mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] > mainCPU.V[(mainCPU.currentOP & 0x00F0) >> 4])
+						mainCPU.V[0xF] = 0; //There is a borrow
+					else
+						mainCPU.V[0xF] = 1; //There is no borrow
+					mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] = mainCPU.V[(mainCPU.currentOP & 0x00F0) >> 4] - mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8];
+					mainCPU.progCounter += 2;
 					break;
 				case 0x000E: // 0x8XYE: Shift VX left by one. VF is set to the value of the most significant bit of VX before the shift
+					mainCPU.V[0xF] = mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] >> 7;
+					mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] <<= 1;
+					mainCPU.progCounter += 2;
 					break;
 					
 				default:
 					printf("Unknown opcode [0x8000]: 0x%X", mainCPU.currentOP);
+					abort();
 					break;
 			}
 			break;
@@ -218,13 +238,17 @@ void cpu_emulateCycle() {
 			
 		case 0xA000: // 0xANNN: Set I to the address NNN
 			mainCPU.I = mainCPU.currentOP & 0x0FFF;
-			mainCPU.progCounter += 2; //Every instruction is 2 bytes, so increment PC by 2
+			mainCPU.progCounter += 2;
 			break;
 			
 		case 0xB000: // 0xBNNN: Jump to the address NNN plus V0
+			//FIXME: I don't think we increment here!
+			mainCPU.progCounter = ((mainCPU.currentOP & 0x0FFF) >> 8) + mainCPU.V[0];
 			break;
 		
 		case 0xC000: // 0xCXNN: Set VX to the result of a bitwise and operation on a random number and NN
+			mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] = (rand() % 0xFF) & (mainCPU.currentOP & 0x00FF);
+			mainCPU.progCounter += 2;
 			break;
 			
 		case 0xD000: // 0xDXYN: Draw a sprite at coordinate (VX,VY) that has a width of 8px and a height of Npx. Each row of 8 pixels is read as bit-coded starting from mem location I; I value doesn't change after the execution of this instruction. As described above, VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that doesn't happen
@@ -269,6 +293,7 @@ void cpu_emulateCycle() {
 					
 				default:
 					printf("Unknown opcode [0xE000]: 0x%X", mainCPU.currentOP);
+					abort();
 					break;
 			}
 			break;
@@ -276,16 +301,38 @@ void cpu_emulateCycle() {
 		case 0xF000:
 			switch (mainCPU.currentOP & 0x00FF) {
 				case 0x0007: // 0xFX07: Set VX to the value of the delay timer
+					mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] = mainCPU.delay_timer;
+					mainCPU.progCounter += 2;
 					break;
 				case 0x000A: // 0xFX0A: Wait for key press, then store in VX
+					{
+						bool keyPressed = false;
+						for (int i = 0; i <= 16; i++) {
+							if (mainCPU.key[i] != 0) {
+								mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] = i;
+								keyPressed = true;
+							}
+						}
+						if (!keyPressed)
+							return;
+						mainCPU.progCounter += 2;
+					}
 					break;
 				case 0x0015: // 0xFX15: Set the delay timer to VX
+					mainCPU.delay_timer = mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8];
+					mainCPU.progCounter += 2;
 					break;
 				case 0x0018: // 0xFX18: Set the sound timer to VX
+					mainCPU.sound_timer = mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8];
+					mainCPU.progCounter += 2;
 					break;
 				case 0x001E: // 0xFX1E: Add VX to I
+					mainCPU.I += mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8];
+					mainCPU.progCounter += 2;
 					break;
 				case 0x0029: // 0xFX29: Set I to the location of the sprite for the character in VX. Characters 0-F in hex are represented by a 4x5 font (mainFontset)
+					mainCPU.I = mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] * 0x5;
+					mainCPU.progCounter += 2;
 					break;
 				case 0x0033: // 0xFX33: Store the binary-coded decimal representation of VX, with the most significant of three digits at the address I, in the middle digit at I+1, and the least significant digit at I+2. So basically take the decimal representation of VX, place the hundreds digit in memory at I, tens digit at I+1, and ones at I+2
 					mainCPU.memory[mainCPU.I]	  =  mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] / 100;
@@ -293,17 +340,28 @@ void cpu_emulateCycle() {
 					mainCPU.memory[mainCPU.I + 2] = (mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] % 100) % 10;
 					break;
 				case 0x0055: // 0xFX55: Stores V0 to VX (Including VX) in memory starting at address I
+					for (int i = 0; i <= ((mainCPU.currentOP & 0x0F00) >> 8); i++) {
+						mainCPU.memory[mainCPU.I + i] = mainCPU.V[i];
+					}
+					mainCPU.progCounter += 2;
 					break;
 				case 0x0065: // 0xFX65: Fills V0 to VX (Including VX) with values from memory starting at address I
+					for (int i = 0; i <= ((mainCPU.currentOP & 0x0F00) >> 8); i++) {
+						mainCPU.V[i] = mainCPU.memory[mainCPU.I + i];
+					}
+					mainCPU.progCounter += 2;
 					break;
 					
 				default:
+					printf("Unknown opcode: 0x%X\n", mainCPU.currentOP);
+					abort();
 					break;
 			}
 			break;
 			
 		default:
-			printf("ERROR: Unknown opcode: 0x%X\n", mainCPU.currentOP);
+			printf("Unknown opcode: 0x%X\n", mainCPU.currentOP);
+			abort();
 			break;
 	}
 	
