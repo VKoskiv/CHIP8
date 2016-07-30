@@ -8,6 +8,8 @@
 
 #include "CPU.h"
 
+#define CPU_DEBUG true
+
 //The Chip-8 font set includes numvers from 0 to 9, and ABCDEF
 //Only the first four bits are used for drawing a number or character
 //So the first four bits from each of these columns is drawn under each other, to form the character
@@ -68,15 +70,10 @@ void cpu_initialize() {
 	mainCPU.sound_timer = 0;
 }
 
-char *getCurrentFrame(int count) {
-	char *ret = malloc(count);
-	if (!ret)
-		return NULL;
-	
+void getCurrentFrame(char *buf, int count) {
 	for (int i = 0; i < count; ++i) {
-		ret[i] = mainCPU.display[i];
+		buf[i] = mainCPU.display[i];
 	}
-	return ret;
 }
 
 int cpu_loadGame(char *filepath) {
@@ -106,6 +103,7 @@ void cpu_emulateCycle() {
 	//Each opcode is two bytes, so we shift left by 8 to add zeros after the first byte
 	//Then AND the second byte to add it after the first byte
 	mainCPU.currentOP = mainCPU.memory[mainCPU.progCounter] << 8 | mainCPU.memory[mainCPU.progCounter + 1];
+	if (CPU_DEBUG) printf("Current OP:0x%X PC:0x%X\n", mainCPU.currentOP, mainCPU.progCounter);
 	
 	//Decode opcode and execute
 	switch (mainCPU.currentOP & 0xF000) { //Compare the FIRST 4 bits

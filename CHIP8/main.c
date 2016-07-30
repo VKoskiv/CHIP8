@@ -10,6 +10,9 @@
 #include "CPU.h"
 #include <time.h>
 
+#define delayEnabled true
+#define milliseconds 500
+
 typedef unsigned char byte;
 
 void destroyWindow(SDL_Window *window) {
@@ -30,23 +33,23 @@ void destroyTexture(SDL_Texture *texture) {
 	}
 }
 
-void render(SDL_Renderer *renderer, SDL_Texture *texture) {
+void render(SDL_Renderer *renderer) {
 	//Clear the window
-	SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+	SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x0, 0x0);
 	SDL_RenderClear(renderer);
 	
-	char *pixels;
-	int pitch = 0;
-	SDL_LockTexture(texture, NULL, (void**)&pixels, &pitch);
-	
 	//Render the data
-	char *data = getCurrentFrame(sizeof(data));
-	if (data) {
-		memcpy(pixels, data, 64 * 32);
+	char data[2048] = {0};
+	getCurrentFrame(data, 2048);
+	for (int y = 0; y < 32; ++y) {
+		for (int x = 0; x < 64; ++x) {
+			if (data[(y*64) + x] == 0) {
+				//Don't draw
+			} else {
+				SDL_RenderDrawPoint(renderer, x, y);
+			}
+		}
 	}
-	
-	SDL_UnlockTexture(texture);
-	SDL_RenderCopy(renderer, texture, NULL, NULL);
 	SDL_RenderPresent(renderer);
 }
 
@@ -143,7 +146,6 @@ int main(int argc, const char * argv[]) {
 	
 	SDL_Window *window = NULL;
 	SDL_Renderer *renderer = NULL;
-	SDL_Texture *texture = NULL;
 	
 	
 	//Init SDL
@@ -165,27 +167,28 @@ int main(int argc, const char * argv[]) {
 		printf("Renderer couldn't be created, error %s", SDL_GetError());
 		return false;
 	}
-	
-	texture = SDL_CreateTexture(renderer, SDL_BITSPERPIXEL(1), SDL_TEXTUREACCESS_STREAMING, windowWidth, windowHeight);
+	SDL_RenderSetScale(renderer, windowScale, windowScale);
 	
 	//Initialize the emulator
 	cpu_initialize();
-	cpu_loadGame("c8games/INVADERS");
+	cpu_loadGame("c8games/MAZE");
 	
 	//Emulation loop
 	for (;;) {
 		cpu_emulateCycle();
 		
 		if (cpu_isDrawFlagSet()) {
-			render(renderer, texture);
+			render(renderer);
 		}
 		
 		setInput();
-		struct timespec ts;
-		int milliseconds = 16;
-		ts.tv_sec = milliseconds / 1000;
-		ts.tv_nsec = (milliseconds % 1000) * 1000000;
-		nanosleep(&ts, NULL);
+		if (delayEnabled) {
+			struct timespec ts;
+			int ms = milliseconds;
+			ts.tv_sec = ms / 1000;
+			ts.tv_nsec = (ms % 1000) * 1000000;
+			nanosleep(&ts, NULL);
+		}
 	}
 	
 	return 4;
