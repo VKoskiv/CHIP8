@@ -8,7 +8,7 @@
 
 #include "CPU.h"
 
-#define CPU_DEBUG true
+#define CPU_DEBUG false
 
 //The Chip-8 font set includes numvers from 0 to 9, and ABCDEF
 //Only the first four bits are used for drawing a number or character
@@ -34,6 +34,8 @@ unsigned char mainFontset[80] = {
 
 chipCPU mainCPU;
 
+void printDebug();
+
 void cpu_initialize() {
 	//Init registers and memory once
 	//The program counter starts at 0x200, and that's where we'll load the program code
@@ -58,6 +60,10 @@ void cpu_initialize() {
 	//Clear the memory
 	for (int i = 0; i <= 4096; i++) {
 		mainCPU.memory[i] = 0;
+	}
+	//Clear the key array
+	for (int i = 0; i <= 16; i++) {
+		mainCPU.key[i] = 0;
 	}
 	
 	//Load the fontset
@@ -103,7 +109,7 @@ void cpu_emulateCycle() {
 	//Each opcode is two bytes, so we shift left by 8 to add zeros after the first byte
 	//Then AND the second byte to add it after the first byte
 	mainCPU.currentOP = mainCPU.memory[mainCPU.progCounter] << 8 | mainCPU.memory[mainCPU.progCounter + 1];
-	if (CPU_DEBUG) printf("Current OP:0x%X PC:0x%X\n", mainCPU.currentOP, mainCPU.progCounter);
+	if (CPU_DEBUG) printDebug();
 	
 	//Decode opcode and execute
 	switch (mainCPU.currentOP & 0xF000) { //Compare the FIRST 4 bits
@@ -272,7 +278,12 @@ void cpu_emulateCycle() {
 							if (mainCPU.display[(x + xline + ((y + yline) * 64))] == 1) {
 								mainCPU.V[0xF] = 1; //Collision happened
 							}
-							mainCPU.display[x + xline + ((y + yline) * 64)] ^= 1;
+							//FIXME: VBRIX crashes here on 0xDAB1
+							if ((x + xline + ((y + yline) * 64)) > 2048)
+								//Don't draw
+								continue;
+							else
+								mainCPU.display[x + xline + ((y + yline) * 64)] ^= 1;
 						}
 					}
 				}
@@ -334,6 +345,10 @@ void cpu_emulateCycle() {
 					mainCPU.progCounter += 2;
 					break;
 				case 0x001E: // 0xFX1E: Add VX to I
+					if (mainCPU.I + mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] > 0xFFF)
+						mainCPU.V[0xF] = 1;//Overflow
+					else
+						mainCPU.V[0xF] = 0;
 					mainCPU.I += mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8];
 					mainCPU.progCounter += 2;
 					break;
@@ -345,14 +360,16 @@ void cpu_emulateCycle() {
 					mainCPU.memory[mainCPU.I]	  =  mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] / 100;
 					mainCPU.memory[mainCPU.I + 1] = (mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] / 10) % 10;
 					mainCPU.memory[mainCPU.I + 2] = (mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] % 100) % 10;
+					mainCPU.progCounter += 2;
 					break;
-				case 0x0055: // 0xFX55: Stores V0 to VX (Including VX) in memory starting at address I
+				case 0x0055: // 0xFX55: Store V0 to VX (Including VX) in memory starting at address I
 					for (int i = 0; i <= ((mainCPU.currentOP & 0x0F00) >> 8); i++) {
 						mainCPU.memory[mainCPU.I + i] = mainCPU.V[i];
 					}
+					mainCPU.I += ((mainCPU.currentOP & 0x0F00) >> 8) + 1;
 					mainCPU.progCounter += 2;
 					break;
-				case 0x0065: // 0xFX65: Fills V0 to VX (Including VX) with values from memory starting at address I
+				case 0x0065: // 0xFX65: Fill V0 to VX (Including VX) with values from memory starting at address I
 					for (int i = 0; i <= ((mainCPU.currentOP & 0x0F00) >> 8); i++) {
 						mainCPU.V[i] = mainCPU.memory[mainCPU.I + i];
 					}
@@ -378,7 +395,7 @@ void cpu_emulateCycle() {
 	}
 	if (mainCPU.sound_timer != 0) {
 		if (mainCPU.sound_timer == 1)
-			printf("BEEP!"); //TODO: Make this beep :D
+			printf("BEEP!\n"); //TODO: Make this beep :D
 		mainCPU.sound_timer--;
 	}
 }
@@ -403,3 +420,187 @@ void cpu_setKeys(byte key) {
 		mainCPU.key[key] = 1;
 	}
 }
+
+//Debug logger
+void printDebug() {
+	//Print progCounter
+	printf("PC:0x%X", mainCPU.progCounter);
+	//Print current op
+	printf(" OP: 0x%X ", mainCPU.currentOP);
+	//Decode and print what op does
+	
+	switch (mainCPU.currentOP & 0xF000) { //Compare the FIRST 4 bits
+		case 0x0000:
+			//In some cases the first 4 bits don't tell us the opcode, in that case check the last 4 bits
+			switch (mainCPU.currentOP & 0x000F) { //Compare the LAST 4 bits
+				case 0x0000: // 0x00E0: Clear the screen
+					printf("0x00E0: Clear the screen");
+					break;
+				case 0x000E: // 0x00EE: Return from subroutine
+					printf("0x00EE: Return from subroutine");
+					break;
+					
+				default:
+					printf("Unknown opcode [0x0000]: 0x%X\n", mainCPU.currentOP);
+					abort();
+					break;
+			}
+			break;
+			
+		case 0x1000: // 0x1NNN: Jump to address NNN
+			printf("0x1NNN: Jump to address NNN");
+			break;
+			
+		case 0x2000: // 0x2NNN: Call subroutine at NNN
+			printf("0x2NNN: Call subroutine at NNN");
+			break;
+			
+		case 0x3000: // 0x3XNN: Skip the next instruction if VX equals NN
+			printf("0x3XNN: Skip the next instruction if VX equals NN");
+			break;
+			
+		case 0x4000: // 0x4XNN: Skip the next instruction if VX doesn't equal NN
+			printf("0x4XNN: Skip the next instruction if VX doesn't equal NN");
+			break;
+			
+		case 0x5000: // 0x5XY0: Skip the next instruction if VX equals VY
+			printf("0x5XY0: Skip the next instruction if VX equals VY");
+			break;
+			
+		case 0x6000: // 0x6XNN: Set VX to NN
+			printf("0x6XNN: Set VX to NN");
+			break;
+			
+		case 0x7000: // 0x7XNN: Add NN to VX
+			printf("0x7XNN: Add NN to VX");
+			break;
+			
+		case 0x8000: //0x8000 has 9 different opcodes, so we check the last 4 bits again to see which one it is
+			switch (mainCPU.currentOP & 0x000F) {
+				case 0x0000: // 0x8XY0: Set VX to the value of VY
+					printf("0x8XY0: Set VX to the value of VY");
+					break;
+				case 0x0001: // 0x8XY1: Set VX to VX or VY
+					printf("0x8XY1: Set VX to VX or VY");
+					break;
+				case 0x0002: // 0x8XY2: Set VX to VX and VY
+					printf("0x8XY2: Set VX to VX and VY");
+					break;
+				case 0x0003: // 0x8XY3: Set VX to VX xor VY
+					printf("0x8XY3: Set VX to VX xor VY");
+					break;
+				case 0x0004: // 0x8XY4: Add VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't
+					printf("0x8XY4: Add VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't");
+					break;
+				case 0x0005: // 0x8XY5: VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't
+					printf("0x8XY5: VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't");
+					break;
+				case 0x0006: // 0x8XY6: Shift VX right by one. VF is set to the value of the least significant bit of VX before the shift
+					printf("0x8XY6: Shift VX right by one. VF is set to the value of the least significant bit of VX before the shift");
+					break;
+				case 0x0007: // 0x8XY7: Set VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't
+					printf("0x8XY7: Set VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't");
+					break;
+				case 0x000E: // 0x8XYE: Shift VX left by one. VF is set to the value of the most significant bit of VX before the shift
+					printf("0x8XYE: Shift VX left by one. VF is set to the value of the most significant bit of VX before the shift");
+					break;
+					
+				default:
+					printf("Unknown opcode [0x8000]: 0x%X", mainCPU.currentOP);
+					abort();
+					break;
+			}
+			break;
+			
+		case 0x9000: // 0x9XY0: Skip the next instruction if VX doesn't equal VY
+			printf("0x9XY0: Skip the next instruction if VX doesn't equal VY");
+			break;
+			
+		case 0xA000: // 0xANNN: Set I to the address NNN
+			printf("0xANNN: Set I to the address NNN");
+			break;
+			
+		case 0xB000: // 0xBNNN: Jump to the address NNN plus V0
+			printf("0xBNNN: Jump to the address NNN plus V0");
+			break;
+			
+		case 0xC000: // 0xCXNN: Set VX to the result of a bitwise and operation on a random number and NN
+			printf("0xCXNN: Set VX to the result of a bitwise and operation on a random number and NN");
+			break;
+			
+		case 0xD000: // 0xDXYN: Draw a sprite at coordinate (VX,VY) that has a width of 8px and a height of Npx. Each row of 8 pixels is read as bit-coded starting from mem location I; I value doesn't change after the execution of this instruction. As described above, VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that doesn't happen
+			printf("0xDXYN: Draw a sprite at coordinate (VX,VY) that has a width of 8px and a height of Npx");
+			break;
+			
+		case 0xE000: //Input opcodes
+			switch (mainCPU.currentOP & 0x00FF) {
+				case 0x009E: // 0xEX9E: Skip the next instruction if the key stored in VX is pressed
+					printf("0xEX9E: Skip the next instruction if the key stored in VX is pressed");
+					break;
+				case 0x00A1: // 0xEXA1: Skip the next instruction if the key stored in VX isn't pressed
+					printf("0xEXA1: Skip the next instruction if the key stored in VX isn't pressed");
+					break;
+					
+				default:
+					printf("Unknown opcode [0xE000]: 0x%X", mainCPU.currentOP);
+					abort();
+					break;
+			}
+			break;
+			
+		case 0xF000:
+			switch (mainCPU.currentOP & 0x00FF) {
+				case 0x0007: // 0xFX07: Set VX to the value of the delay timer
+					printf("0xFX07: Set VX to the value of the delay timer");
+					break;
+				case 0x000A: // 0xFX0A: Wait for key press, then store in VX
+					printf("0xFX0A: Wait for key press, then store in VX");
+					break;
+				case 0x0015: // 0xFX15: Set the delay timer to VX
+					printf("0xFX15: Set the delay timer to VX");
+					break;
+				case 0x0018: // 0xFX18: Set the sound timer to VX
+					printf("0xFX18: Set the sound timer to VX");
+					break;
+				case 0x001E: // 0xFX1E: Add VX to I
+					printf("0xFX1E: Add VX to I");
+					break;
+				case 0x0029: // 0xFX29: Set I to the location of the sprite for the character in VX. Characters 0-F in hex are represented by a 4x5 font (mainFontset)
+					printf("0xFX29: Set I to the location of the sprite for the character in VX");
+					break;
+				case 0x0033: // 0xFX33: Store the binary-coded decimal representation of VX, with the most significant of three digits at the address I, in the middle digit at I+1, and the least significant digit at I+2. So basically take the decimal representation of VX, place the hundreds digit in memory at I, tens digit at I+1, and ones at I+2
+					printf("0xFX33: Store the binary-coded decimal representation of VX");
+					break;
+				case 0x0055: // 0xFX55: Store V0 to VX (Including VX) in memory starting at address I
+					printf("0xFX55: Store V0 to VX (Including VX) in memory starting at address I");
+					break;
+				case 0x0065: // 0xFX65: Fill V0 to VX (Including VX) with values from memory starting at address I
+					printf("0xFX65: Fill V0 to VX (Including VX) with values from memory starting at address I");
+					break;
+					
+				default:
+					printf("Unknown opcode: 0x%X\n", mainCPU.currentOP);
+					abort();
+					break;
+			}
+			break;
+			
+		default:
+			printf("Unknown opcode: 0x%X\n", mainCPU.currentOP);
+			abort();
+			break;
+	}
+	
+	//Add newline
+	printf("\n");
+}
+
+
+
+
+
+
+
+
+
+

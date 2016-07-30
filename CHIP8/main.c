@@ -11,7 +11,7 @@
 #include <time.h>
 
 #define delayEnabled true
-#define milliseconds 500
+#define milliseconds 2
 
 typedef unsigned char byte;
 
@@ -87,50 +87,35 @@ void setInput() {
 	
 	if (keys[SDL_SCANCODE_1]) {
 		input = 0x1;
-	}
-	if (keys[SDL_SCANCODE_2]) {
+	} else if (keys[SDL_SCANCODE_2]) {
 		input = 0x2;
-	}
-	if (keys[SDL_SCANCODE_3]) {
+	} else if (keys[SDL_SCANCODE_3]) {
 		input = 0x3;
-	}
-	if (keys[SDL_SCANCODE_4]) {
+	} else if (keys[SDL_SCANCODE_4]) {
 		input = 0xC;
-	}
-	if (keys[SDL_SCANCODE_Q]) {
+	} else if (keys[SDL_SCANCODE_Q]) {
 		input = 0x4;
-	}
-	if (keys[SDL_SCANCODE_W]) {
+	} else if (keys[SDL_SCANCODE_W]) {
 		input = 0x5;
-	}
-	if (keys[SDL_SCANCODE_E]) {
+	} else if (keys[SDL_SCANCODE_E]) {
 		input = 0x6;
-	}
-	if (keys[SDL_SCANCODE_R]) {
+	} else if (keys[SDL_SCANCODE_R]) {
 		input = 0xD;
-	}
-	if (keys[SDL_SCANCODE_A]) {
+	} else if (keys[SDL_SCANCODE_A]) {
 		input = 0x7;
-	}
-	if (keys[SDL_SCANCODE_S]) {
+	} else if (keys[SDL_SCANCODE_S]) {
 		input = 0x8;
-	}
-	if (keys[SDL_SCANCODE_D]) {
+	} else if (keys[SDL_SCANCODE_D]) {
 		input = 0x9;
-	}
-	if (keys[SDL_SCANCODE_F]) {
+	} else if (keys[SDL_SCANCODE_F]) {
 		input = 0xE;
-	}
-	if (keys[SDL_SCANCODE_Z]) {
+	} else if (keys[SDL_SCANCODE_Z]) {
 		input = 0xA;
-	}
-	if (keys[SDL_SCANCODE_X]) {
+	} else if (keys[SDL_SCANCODE_X]) {
 		input = 0x0;
-	}
-	if (keys[SDL_SCANCODE_C]) {
+	} else if (keys[SDL_SCANCODE_C]) {
 		input = 0xB;
-	}
-	if (keys[SDL_SCANCODE_V]) {
+	} else if (keys[SDL_SCANCODE_V]) {
 		input = 0xF;
 	}
 
@@ -171,7 +156,7 @@ int main(int argc, const char * argv[]) {
 	
 	//Initialize the emulator
 	cpu_initialize();
-	cpu_loadGame("c8games/MAZE");
+	cpu_loadGame("c8games/VBRIX");
 	
 	//Emulation loop
 	for (;;) {
