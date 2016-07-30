@@ -68,6 +68,10 @@ void cpu_initialize() {
 	mainCPU.sound_timer = 0;
 }
 
+byte* getCurrentFrame() {
+	return mainCPU.display;
+}
+
 int cpu_loadGame(char *filepath) {
 	
 	FILE *inputFile = fopen(filepath, "r");

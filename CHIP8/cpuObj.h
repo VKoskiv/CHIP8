@@ -21,19 +21,19 @@ typedef unsigned char byte;
 
 typedef struct {
 	unsigned short currentOP;   //2 bytes
-	unsigned char memory[4096]; //4KB
-	unsigned char V[16];		//Registers, V0 to VE, 1 byte each and VF for flags
+	byte memory[4096]; //4KB
+	byte V[16];		//Registers, V0 to VE, 1 byte each and VF for flags
 	unsigned short I;			//Index register
 	unsigned short progCounter; //Program counter, from 0x000 to 0xFFF
 	
 	//Graphics, a 64x32 1 bit bitmap, 2048 pixels
-	unsigned char display[64 * 32];
+	byte display[64 * 32];
 	//Draw flag, set to true if screen needs to be updated
 	bool drawFlag;
 	
 	//No interrupts or hardware registers, only two timer registers that count down to 0 at 60hz
-	unsigned char delay_timer; //Used for delays
-	unsigned char sound_timer; //Used for sound, system buzzer sounds when this reaches 0
+	byte delay_timer; //Used for delays
+	byte sound_timer; //Used for sound, system buzzer sounds when this reaches 0
 	
 	//Stack
 	//Some opcodes can jump to a mem location or call a subroutine
@@ -44,7 +44,7 @@ typedef struct {
 	
 	//Input
 	//Chip 8 has a hex keypad with 16 keys, 0x0-0xF, this is an array to store the current state of the key
-	unsigned char key[16];
+	byte key[16];
 } chipCPU;
 
 #endif /* cpuObj_h */

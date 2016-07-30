@@ -46,8 +46,9 @@ void render(SDL_Renderer *renderer, SDL_Texture *texture) {
 	SDL_LockTexture(texture, NULL, (void**)&pixels, &pitch);
 	
 	//Render the data
-	byte *data; //TODO: Assign the frame data from the emulator to this pointer
-	memcpy(pixels, data, 64*32);
+	byte* data = getCurrentFrame();
+	memcpy(pixels, data, 64 * 32);
+	
 	SDL_UnlockTexture(texture);
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
 	SDL_RenderPresent(renderer);
@@ -80,7 +81,7 @@ int main(int argc, const char * argv[]) {
 		return false;
 	}
 	
-	//SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, windowWidth, windowHeight);
+	SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, windowWidth, windowHeight);
 	
 	//Initialize the emulator
 	cpu_initialize();
@@ -91,7 +92,7 @@ int main(int argc, const char * argv[]) {
 		cpu_emulateCycle();
 		
 		if (cpu_isDrawFlagSet()) {
-			//Draw graphics
+			render(renderer, texture);
 		}
 		cpu_setKeys();
 		
