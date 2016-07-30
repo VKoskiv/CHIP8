@@ -35,13 +35,15 @@ void render(SDL_Renderer *renderer, SDL_Texture *texture) {
 	SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 	SDL_RenderClear(renderer);
 	
-	byte *pixels;
+	char *pixels;
 	int pitch = 0;
 	SDL_LockTexture(texture, NULL, (void**)&pixels, &pitch);
 	
 	//Render the data
-	byte* data = getCurrentFrame();
-	memcpy(pixels, data, 64 * 32);
+	char *data = getCurrentFrame(sizeof(data));
+	if (data) {
+		memcpy(pixels, data, 64 * 32);
+	}
 	
 	SDL_UnlockTexture(texture);
 	SDL_RenderCopy(renderer, texture, NULL, NULL);
@@ -139,6 +141,11 @@ int main(int argc, const char * argv[]) {
 	int windowHeight = 32;
 	int windowScale = 4;
 	
+	SDL_Window *window = NULL;
+	SDL_Renderer *renderer = NULL;
+	SDL_Texture *texture = NULL;
+	
+	
 	//Init SDL
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
 		printf("SDL couldn't initialize, error %s",SDL_GetError());
@@ -146,20 +153,20 @@ int main(int argc, const char * argv[]) {
 	}
 	
 	//Init window
-	SDL_Window *window = SDL_CreateWindow("CHIP-8 by VKoskiv 2016", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth * windowScale, windowHeight * windowScale, SDL_WINDOW_SHOWN);
+	window = SDL_CreateWindow("CHIP-8 by VKoskiv 2016", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth * windowScale, windowHeight * windowScale, SDL_WINDOW_SHOWN);
 	if (window == NULL) {
 		printf("Window couldn't be created, error %s", SDL_GetError());
 		return false;
 	}
 	
 	//Init renderer
-	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (renderer == NULL) {
 		printf("Renderer couldn't be created, error %s", SDL_GetError());
 		return false;
 	}
 	
-	SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, windowWidth, windowHeight);
+	texture = SDL_CreateTexture(renderer, SDL_BITSPERPIXEL(1), SDL_TEXTUREACCESS_STREAMING, windowWidth, windowHeight);
 	
 	//Initialize the emulator
 	cpu_initialize();

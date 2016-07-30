@@ -68,8 +68,15 @@ void cpu_initialize() {
 	mainCPU.sound_timer = 0;
 }
 
-byte* getCurrentFrame() {
-	return mainCPU.display;
+char *getCurrentFrame(int count) {
+	char *ret = malloc(count);
+	if (!ret)
+		return NULL;
+	
+	for (int i = 0; i < count; ++i) {
+		ret[i] = mainCPU.display[i];
+	}
+	return ret;
 }
 
 int cpu_loadGame(char *filepath) {
@@ -111,10 +118,11 @@ void cpu_emulateCycle() {
 						mainCPU.display[i] = 0x0;
 					}
 					mainCPU.drawFlag = true;
+					mainCPU.progCounter += 2;
 					break;
 				case 0x000E: // 0x00EE: Return from subroutine
-					mainCPU.progCounter = mainCPU.stack[mainCPU.stackPointer];
 					--mainCPU.stackPointer;
+					mainCPU.progCounter = mainCPU.stack[mainCPU.stackPointer];
 					mainCPU.progCounter += 2;
 					break;
 					
@@ -265,11 +273,12 @@ void cpu_emulateCycle() {
 						if ((pixel & (0x80 >> xline)) != 0) {
 							if (mainCPU.display[(x + xline + ((y + yline) * 64))] == 1) {
 								mainCPU.V[0xF] = 1; //Collision happened
-								mainCPU.display[x + xline + ((y + yline) * 64)] ^= 1;
 							}
+							mainCPU.display[x + xline + ((y + yline) * 64)] ^= 1;
 						}
 					}
 				}
+				
 				mainCPU.drawFlag = true; //We've altered the display array, therefore set drawflag to true to update the screen
 				mainCPU.progCounter += 2;
 			}
