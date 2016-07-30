@@ -54,6 +54,90 @@ void render(SDL_Renderer *renderer, SDL_Texture *texture) {
 	SDL_RenderPresent(renderer);
 }
 
+/*
+ KEYMAPPING
+ CHIP8 HEX MAP
+ +-+-+-+-+
+ |1|2|3|C|
+ +-+-+-+-+
+ |4|5|6|D|
+ +-+-+-+-+
+ |7|8|9|E|
+ +-+-+-+-+
+ |A|0|B|F|
+ +-+-+-+-+
+ HOST KEYBOARD
+ +-+-+-+-+
+ |1|2|3|4|
+ +-+-+-+-+
+ |Q|W|E|R|
+ +-+-+-+-+
+ |A|S|D|F|
+ +-+-+-+-+
+ |Z|X|C|V|
+ +-+-+-+-+
+ 
+ */
+
+void setInput() {
+	//Get keyboard input, then send that to the CPU
+	
+	SDL_PumpEvents();
+	const Uint8 *keys = SDL_GetKeyboardState(NULL);
+	byte input = 0xFF;
+	
+	if (keys[SDL_SCANCODE_1]) {
+		input = 0x1;
+	}
+	if (keys[SDL_SCANCODE_2]) {
+		input = 0x2;
+	}
+	if (keys[SDL_SCANCODE_3]) {
+		input = 0x3;
+	}
+	if (keys[SDL_SCANCODE_4]) {
+		input = 0xC;
+	}
+	if (keys[SDL_SCANCODE_Q]) {
+		input = 0x4;
+	}
+	if (keys[SDL_SCANCODE_W]) {
+		input = 0x5;
+	}
+	if (keys[SDL_SCANCODE_E]) {
+		input = 0x6;
+	}
+	if (keys[SDL_SCANCODE_R]) {
+		input = 0xD;
+	}
+	if (keys[SDL_SCANCODE_A]) {
+		input = 0x7;
+	}
+	if (keys[SDL_SCANCODE_S]) {
+		input = 0x8;
+	}
+	if (keys[SDL_SCANCODE_D]) {
+		input = 0x9;
+	}
+	if (keys[SDL_SCANCODE_F]) {
+		input = 0xE;
+	}
+	if (keys[SDL_SCANCODE_Z]) {
+		input = 0xA;
+	}
+	if (keys[SDL_SCANCODE_X]) {
+		input = 0x0;
+	}
+	if (keys[SDL_SCANCODE_C]) {
+		input = 0xB;
+	}
+	if (keys[SDL_SCANCODE_V]) {
+		input = 0xF;
+	}
+
+	cpu_setKeys(input);
+}
+
 
 
 int main(int argc, const char * argv[]) {
@@ -94,8 +178,8 @@ int main(int argc, const char * argv[]) {
 		if (cpu_isDrawFlagSet()) {
 			render(renderer, texture);
 		}
-		cpu_setKeys();
 		
+		setInput();
 		
 	}
 	

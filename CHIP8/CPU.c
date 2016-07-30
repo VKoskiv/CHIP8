@@ -329,6 +329,12 @@ bool cpu_isDrawFlagSet() {
 }
 
 
-void cpu_setKeys() {
-	
+void cpu_setKeys(byte key) {
+	if (key == 0xFF) {
+		for (int i = 0; i <= 16; i++) {
+			mainCPU.key[i] = 0;
+		}
+	} else {
+		mainCPU.key[key] = 1;
+	}
 }

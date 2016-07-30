@@ -16,7 +16,7 @@ int cpu_loadGame(char *filepath);
 void cpu_emulateCycle();
 byte* getCurrentFrame();
 bool cpu_isDrawFlagSet();
-void cpu_setKeys();
+void cpu_setKeys(byte key);
 
 
 #endif /* CPU_h */
