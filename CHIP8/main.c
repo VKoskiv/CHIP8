@@ -75,6 +75,10 @@ int main(int argc, const char * argv[]) {
 	
 	//SDL_Texture *texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, windowWidth, windowHeight);
 	
+	//Initialize the emulator
+	cpu_initialize();
+	cpu_loadGame("c8games/INVADERS");
+	
 	//Emulation loop
 	for (;;) {
 		cpu_emulateCycle();

@@ -12,7 +12,7 @@
 #include "cpuObj.h"
 
 void cpu_initialize();
-void cpu_loadGame();
+int cpu_loadGame(char *filepath);
 void cpu_emulateCycle();
 bool cpu_isDrawFlagSet();
 void cpu_setKeys();

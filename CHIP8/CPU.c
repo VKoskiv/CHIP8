@@ -64,15 +64,30 @@ void cpu_initialize() {
 	}
 	
 	//Reset timers
-	
+	mainCPU.delay_timer = 0;
+	mainCPU.sound_timer = 0;
 }
 
-void cpu_loadGame() {
-	//We will load the game binary with fopen into this array
-	unsigned char buffer[128]; //TODO: Get the size from file, and load the data into this
+int cpu_loadGame(char *filepath) {
+	
+	FILE *inputFile = fopen(filepath, "r");
+	if (!inputFile) {
+		return -1;
+	}
+	fseek(inputFile, 0L, SEEK_END);
+	long size = ftell(inputFile);
+	unsigned char buffer[size];
+	rewind(inputFile);
+	
+	for (int i = 0; i <= size; i++) {
+		buffer[i] = getc(inputFile);
+	}
+	
+	
 	for (int i = 0; i <= sizeof(buffer); i++) {
 		mainCPU.memory[i + 512] = buffer[i]; //0x200 == 512, which is where the CPU starts execution
 	}
+	return 0;
 }
 
 void cpu_emulateCycle() {
