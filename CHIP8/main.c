@@ -6,6 +6,13 @@
 //  Copyright © 2016 Valtteri Koskivuori. All rights reserved.
 //
 
+/*
+ TODO:
+ Add input
+ Add output
+ Add sleep() to run the emulation loop at 60hz
+ */
+
 #include <SDL2/SDL.h>
 #include "CPU.h"
 

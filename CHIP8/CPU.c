@@ -115,6 +115,8 @@ void cpu_emulateCycle() {
 			break;
 			
 		case 0x1000: // 0x1NNN: Jump to address NNN
+			//Don't increment the program counter because we're jumping to an address
+			mainCPU.progCounter = mainCPU.currentOP & 0x0FFF;
 			break;
 			
 		case 0x2000: // 0x2NNN: Call subroutine at NNN
@@ -125,29 +127,54 @@ void cpu_emulateCycle() {
 			break;
 			
 		case 0x3000: // 0x3XNN: Skip the next instruction if VX equals NN
+			if (mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] == (mainCPU.currentOP & 0x00FF))
+				mainCPU.progCounter += 4;
+			else
+				mainCPU.progCounter += 2;
 			break;
 			
-		case 0x4000: // 0x3XNN: Skip the next instruction if VX doesn't equal NN
+		case 0x4000: // 0x4XNN: Skip the next instruction if VX doesn't equal NN
+			if (mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] != (mainCPU.currentOP & 0x00FF))
+				mainCPU.progCounter += 4;
+			else
+				mainCPU.progCounter += 2;
 			break;
 			
 		case 0x5000: // 0x5XY0: Skip the next instruction if VX equals VY
+			if (mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] == mainCPU.V[(mainCPU.currentOP & 0x00F0) >> 4])
+				mainCPU.progCounter += 4;
+			else
+				mainCPU.progCounter += 2;
 			break;
 			
 		case 0x6000: // 0x6XNN: Set VX to NN
+			mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] = (mainCPU.currentOP & 0x00FF);
+			mainCPU.progCounter += 2;
 			break;
 			
 		case 0x7000: // 0x7XNN: Add NN to VX
+			//FIXME: Can this overflow?
+			mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] += (mainCPU.currentOP & 0x00FF);
+			mainCPU.progCounter += 2;
 			break;
 			
 		case 0x8000: //0x8000 has 9 different opcodes, so we check the last 4 bits again to see which one it is
 			switch (mainCPU.currentOP & 0x000F) {
 				case 0x0000: // 0x8XY0: Set VX to the value of VY
+					mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] = mainCPU.V[(mainCPU.currentOP & 0x00F0) >> 4];
+					mainCPU.progCounter += 2;
 					break;
 				case 0x0001: // 0x8XY1: Set VX to VX or VY
+					mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] = (mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] | mainCPU.V[(mainCPU.currentOP & 0x00F0) >> 4]);
+					mainCPU.progCounter += 2;
 					break;
 				case 0x0002: // 0x8XY2: Set VX to VX and VY
+					mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] = (mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] & mainCPU.V[(mainCPU.currentOP & 0x00F0) >> 4]);
+					mainCPU.progCounter += 2;
 					break;
 				case 0x0003: // 0x8XY3: Set VX to VX xor VY
+					mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] = (mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] ^ mainCPU.V[(mainCPU.currentOP & 0x00F0) >> 4]);
+					mainCPU.progCounter += 2;
 					break;
 				case 0x0004: // 0x8XY4: Add VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't
 					//Remember to set VF to carry if overflows
