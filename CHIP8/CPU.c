@@ -153,7 +153,12 @@ void cpu_emulateCycle() {
 			break;
 			
 		case 0x7000: // 0x7XNN: Add NN to VX
-			//FIXME: Can this overflow?
+			//Check for overflow
+			//FIXME: Spec does not tell to set carry flag here, so disable this if it freaks out, probably maybe shouldn't cause trouble?
+			if ((mainCPU.currentOP & 0x00FF) > (0xFF - mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8]))
+				mainCPU.V[0xF] = 1; //Carry
+			else
+				mainCPU.V[0xF] = 0; //No overflow, no carry
 			mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] += (mainCPU.currentOP & 0x00FF);
 			mainCPU.progCounter += 2;
 			break;
@@ -201,6 +206,10 @@ void cpu_emulateCycle() {
 			break;
 		
 		case 0x9000: // 0x9XY0: Skip the next instruction if VX doesn't equal VY
+			if (mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] != mainCPU.V[(mainCPU.currentOP & 0x00F0) >> 4])
+				mainCPU.progCounter += 4;
+			else
+				mainCPU.progCounter += 2;
 			break;
 			
 		case 0xA000: // 0xANNN: Set I to the address NNN
