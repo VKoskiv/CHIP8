@@ -74,7 +74,7 @@ void cpu_initialize()
 	}
 	
 	//Load the fontset
-	for (int i = 0; i <= 80; i++)
+	for (int i = 0; i < 80; i++)
 	{
 		mainCPU.memory[i] = mainFontset[i];
 	}
@@ -306,12 +306,8 @@ void cpu_emulate_cycle()
 							{
 								mainCPU.V[0xF] = 1; //Collision happened
 							}
-							//FIXME: VBRIX crashes here on 0xDAB1
-							if ((x + xline + ((y + yline) * 64)) > 2048)
-								//Don't draw
-								continue;
-							else
-								mainCPU.display[x + xline + ((y + yline) * 64)] ^= 1;
+							int pixelindex = (((y + yline) % 32) * 64) + ((x + xline) % 64);
+							mainCPU.display[((x + xline) % 64) + (((y + yline) % 32) * 64)] ^= 1;
 						}
 					}
 				}
@@ -326,13 +322,13 @@ void cpu_emulate_cycle()
 			switch (mainCPU.currentOP & 0x00FF)
 			{
 				case 0x009E: // 0xEX9E: Skip the next instruction if the key stored in VX is pressed
-					if (mainCPU.key[(mainCPU.currentOP & 0x0F00) >> 8] != 0)
+					if (mainCPU.key[mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8]] != 0)
 						mainCPU.progCounter += 4;
 					else
 						mainCPU.progCounter += 2;
 					break;
 				case 0x00A1: // 0xEXA1: Skip the next instruction if the key stored in VX isn't pressed
-					if (mainCPU.key[(mainCPU.currentOP & 0x0F00) >> 8] == 0)
+					if (mainCPU.key[mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8]] == 0)
 						mainCPU.progCounter += 4;
 					else
 						mainCPU.progCounter += 2;
@@ -394,7 +390,7 @@ void cpu_emulate_cycle()
 					mainCPU.progCounter += 2;
 					break;
 				case 0x0055: // 0xFX55: Store V0 to VX (Including VX) in memory starting at address I
-					for (int i = 0; i <= ((mainCPU.currentOP & 0x0F00) >> 8); i++)
+					for (int i = 0; i < ((mainCPU.currentOP & 0x0F00) >> 8); i++)
 					{
 						mainCPU.memory[mainCPU.I + i] = mainCPU.V[i];
 					}
@@ -402,7 +398,7 @@ void cpu_emulate_cycle()
 					mainCPU.progCounter += 2;
 					break;
 				case 0x0065: // 0xFX65: Fill V0 to VX (Including VX) with values from memory starting at address I
-					for (int i = 0; i <= ((mainCPU.currentOP & 0x0F00) >> 8); i++)
+					for (int i = 0; i < ((mainCPU.currentOP & 0x0F00) >> 8); i++)
 					{
 						mainCPU.V[i] = mainCPU.memory[mainCPU.I + i];
 					}
