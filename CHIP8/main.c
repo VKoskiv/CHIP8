@@ -206,7 +206,7 @@ int main(int argc, const char * argv[])
 	
 	//Initialize the emulator
 	cpu_initialize();
-	if (cpu_load_game("c8games/TESTPROG") == -1)
+	if (cpu_load_game("c8games/MAZE") == -1)
 	{
 		printf("Couldn't find the ROM file! (Check working dir/path)\n");
 		return 0;

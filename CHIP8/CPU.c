@@ -35,7 +35,7 @@ unsigned char mainFontset[80] =
 
 chipCPU mainCPU;
 
-void printDebug();
+void print_debug();
 
 void cpu_initialize()
 {
@@ -129,7 +129,7 @@ void cpu_emulate_cycle()
 	//Each opcode is two bytes, so we shift left by 8 to add zeros after the first byte
 	//Then AND the second byte to add it after the first byte
 	mainCPU.currentOP = mainCPU.memory[mainCPU.progCounter] << 8 | mainCPU.memory[mainCPU.progCounter + 1];
-	if (CPU_DEBUG) printDebug();
+	if (CPU_DEBUG) print_debug();
 	
 	//Decode opcode and execute
 	switch (mainCPU.currentOP & 0xF000) //Compare the FIRST 4 bits
