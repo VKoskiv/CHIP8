@@ -15,37 +15,48 @@
 
 typedef unsigned char byte;
 
-void destroyWindow(SDL_Window *window) {
-	if (window != NULL) {
+void destroy_window(SDL_Window *window)
+{
+	if (window != NULL)
+	{
 		SDL_DestroyWindow(window);
 	}
 }
 
-void destroyRenderer(SDL_Renderer *renderer) {
-	if (renderer != NULL) {
+void destroy_renderer(SDL_Renderer *renderer)
+{
+	if (renderer != NULL)
+	{
 		SDL_DestroyRenderer(renderer);
 	}
 }
 
-void destroyTexture(SDL_Texture *texture) {
-	if (texture != NULL) {
+void destroy_texture(SDL_Texture *texture)
+{
+	if (texture != NULL)
+	{
 		SDL_DestroyTexture(texture);
 	}
 }
 
-void render(SDL_Renderer *renderer) {
+void render(SDL_Renderer *renderer)
+{
 	//Clear the window
 	SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x0, 0x0);
 	SDL_RenderClear(renderer);
 	
 	//Render the data
 	char data[2048] = {0};
-	getCurrentFrame(data, 2048);
-	for (int y = 0; y < 32; ++y) {
-		for (int x = 0; x < 64; ++x) {
-			if (data[(y*64) + x] == 0) {
+	get_current_frame(data, 2048);
+	for (int y = 0; y < 32; ++y)
+	{
+		for (int x = 0; x < 64; ++x)
+		{
+			if (data[(y*64) + x] == 0)
+			{
 				//Don't draw
-			} else {
+			} else
+			{
 				SDL_RenderDrawPoint(renderer, x, y);
 			}
 		}
@@ -78,7 +89,8 @@ void render(SDL_Renderer *renderer) {
  
  */
 
-void setInput() {
+void set_input()
+{
 	//Get keyboard input, then send that to the CPU
 	
 	SDL_PumpEvents();
@@ -86,63 +98,80 @@ void setInput() {
 	byte input = 0xFF;
 	
 	//Prevent keys from sticking when pressing more than one at a time
-	cpu_setKeys(0xFF);
+	cpu_set_keys(0xFF);
 	
-	if (keys[SDL_SCANCODE_1]) {
+	if (keys[SDL_SCANCODE_1])
+	{
 		input = 0x1;
 	}
-	if (keys[SDL_SCANCODE_2]) {
+	if (keys[SDL_SCANCODE_2])
+	{
 		input = 0x2;
 	}
-	if (keys[SDL_SCANCODE_3]) {
+	if (keys[SDL_SCANCODE_3])
+	{
 		input = 0x3;
 	}
-	if (keys[SDL_SCANCODE_4]) {
+	if (keys[SDL_SCANCODE_4])
+	{
 		input = 0xC;
 	}
-	if (keys[SDL_SCANCODE_Q]) {
+	if (keys[SDL_SCANCODE_Q])
+	{
 		input = 0x4;
 	}
-	if (keys[SDL_SCANCODE_W]) {
+	if (keys[SDL_SCANCODE_W])
+	{
 		input = 0x5;
 	}
-	if (keys[SDL_SCANCODE_E]) {
+	if (keys[SDL_SCANCODE_E])
+	{
 		input = 0x6;
 	}
-	if (keys[SDL_SCANCODE_R]) {
+	if (keys[SDL_SCANCODE_R])
+	{
 		input = 0xD;
 	}
-	if (keys[SDL_SCANCODE_A]) {
+	if (keys[SDL_SCANCODE_A])
+	{
 		input = 0x7;
 	}
-	if (keys[SDL_SCANCODE_S]) {
+	if (keys[SDL_SCANCODE_S])
+	{
 		input = 0x8;
 	}
-	if (keys[SDL_SCANCODE_D]) {
+	if (keys[SDL_SCANCODE_D])
+	{
 		input = 0x9;
 	}
-	if (keys[SDL_SCANCODE_F]) {
+	if (keys[SDL_SCANCODE_F])
+	{
 		input = 0xE;
 	}
-	if (keys[SDL_SCANCODE_Z]) {
+	if (keys[SDL_SCANCODE_Z])
+	{
 		input = 0xA;
 	}
-	if (keys[SDL_SCANCODE_X]) {
+	if (keys[SDL_SCANCODE_X])
+	{
 		input = 0x0;
 	}
-	if (keys[SDL_SCANCODE_C]) {
+	if (keys[SDL_SCANCODE_C])
+	{
 		input = 0xB;
 	}
-	if (keys[SDL_SCANCODE_V]) {
+	if (keys[SDL_SCANCODE_V])
+	{
 		input = 0xF;
 	}
 
-	cpu_setKeys(input);
+	cpu_set_keys(input);
 }
 
 
 
-int main(int argc, const char * argv[]) {
+int main(int argc, const char * argv[])
+{
 	int windowWidth = 64;
 	int windowHeight = 32;
 	int windowScale = 4;
@@ -152,21 +181,24 @@ int main(int argc, const char * argv[]) {
 	
 	
 	//Init SDL
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
+	{
 		printf("SDL couldn't initialize, error %s",SDL_GetError());
 		return false;
 	}
 	
 	//Init window
 	window = SDL_CreateWindow("CHIP-8 by VKoskiv 2016", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth * windowScale, windowHeight * windowScale, SDL_WINDOW_SHOWN);
-	if (window == NULL) {
+	if (window == NULL)
+	{
 		printf("Window couldn't be created, error %s", SDL_GetError());
 		return false;
 	}
 	
 	//Init renderer
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	if (renderer == NULL) {
+	if (renderer == NULL)
+	{
 		printf("Renderer couldn't be created, error %s", SDL_GetError());
 		return false;
 	}
@@ -174,21 +206,26 @@ int main(int argc, const char * argv[]) {
 	
 	//Initialize the emulator
 	cpu_initialize();
-	if (cpu_loadGame("c8games/VBRIX") == -1) {
+	if (cpu_load_game("c8games/VBRIX") == -1)
+	{
 		printf("Couldn't find the ROM file! (Check working dir/path)\n");
 		abort();
 	}
 	
 	//Emulation loop
-	for (;;) {
-		cpu_emulateCycle();
+	for (;;)
+	{
+		cpu_emulate_cycle();
 		
-		if (cpu_isDrawFlagSet()) {
+		if (cpu_is_drawflag_set())
+		{
 			render(renderer);
 		}
 		
-		setInput();
-		if (delayEnabled) {
+		set_input();
+		
+		if (delayEnabled)
+		{
 			struct timespec ts;
 			int ms = milliseconds;
 			ts.tv_sec = ms / 1000;

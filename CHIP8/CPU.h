@@ -21,7 +21,8 @@ typedef unsigned char byte;
 // 0x050-0x0A0 Used for the built in font set from 0-F
 // 0x200-0xFFF Program ROM and work RAM
 
-typedef struct {
+typedef struct
+{
 	unsigned short currentOP;   //2 bytes
 	byte memory[4096]; //4KB
 	byte V[16];		//Registers, V0 to VE, 1 byte each and VF for flags
@@ -50,11 +51,11 @@ typedef struct {
 } chipCPU;
 
 void cpu_initialize();
-int cpu_loadGame(char *filepath);
-void cpu_emulateCycle();
-void getCurrentFrame(char *buf, int count);
-bool cpu_isDrawFlagSet();
-void cpu_setKeys(byte key);
+int cpu_load_game(char *filepath);
+void cpu_emulate_cycle();
+void get_current_frame(char *buf, int count);
+bool cpu_is_drawflag_set();
+void cpu_set_keys(byte key);
 
 
 #endif /* CPU_h */

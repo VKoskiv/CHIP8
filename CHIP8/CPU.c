@@ -13,7 +13,8 @@
 //The Chip-8 font set includes numvers from 0 to 9, and ABCDEF
 //Only the first four bits are used for drawing a number or character
 //So the first four bits from each of these columns is drawn under each other, to form the character
-unsigned char mainFontset[80] = {
+unsigned char mainFontset[80] =
+{
 	0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
 	0x20, 0x60, 0x20, 0x20, 0x70, // 1
 	0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
@@ -36,7 +37,8 @@ chipCPU mainCPU;
 
 void printDebug();
 
-void cpu_initialize() {
+void cpu_initialize()
+{
 	//Init registers and memory once
 	//The program counter starts at 0x200, and that's where we'll load the program code
 	mainCPU.progCounter = 0x200;
@@ -46,28 +48,34 @@ void cpu_initialize() {
 	mainCPU.drawFlag = false;
 	
 	//Clear the display
-	for (int i = 0; i <= 2048; i++) {
+	for (int i = 0; i < 2048; i++)
+	{
 		mainCPU.display[i] = 0;
 	}
 	//Clear the stack
-	for (int i = 0; i <= 16; i++) {
+	for (int i = 0; i < 16; i++)
+	{
 		mainCPU.stack[i] = 0;
 	}
 	//Clear the registers V0-VF
-	for (int i = 0; i <= 16; i++) {
+	for (int i = 0; i < 16; i++)
+	{
 		mainCPU.V[i] = 0;
 	}
 	//Clear the memory
-	for (int i = 0; i <= 4096; i++) {
+	for (int i = 0; i < 4096; i++)
+	{
 		mainCPU.memory[i] = 0;
 	}
 	//Clear the key array
-	for (int i = 0; i <= 16; i++) {
+	for (int i = 0; i < 16; i++)
+	{
 		mainCPU.key[i] = 0;
 	}
 	
 	//Load the fontset
-	for (int i = 0; i <= 80; i++) {
+	for (int i = 0; i <= 80; i++)
+	{
 		mainCPU.memory[i] = mainFontset[i];
 	}
 	
@@ -76,23 +84,28 @@ void cpu_initialize() {
 	mainCPU.sound_timer = 0;
 }
 
-void getCurrentFrame(char *buf, int count) {
-	for (int i = 0; i < count; ++i) {
+void get_current_frame(char *buf, int count)
+{
+	for (int i = 0; i < count; ++i)
+	{
 		buf[i] = mainCPU.display[i];
 	}
 }
 
-int cpu_loadGame(char *filepath) {
+int cpu_load_game(char *filepath)
+{
 	
 	FILE *inputFile = fopen(filepath, "r");
-	if (!inputFile) {
+	if (!inputFile)
+	{
 		return -1;
 	}
 	fseek(inputFile, 0L, SEEK_END);
 	long size = ftell(inputFile);
 	
 	//Check file size
-	if (size >= 4096 - 512) {
+	if (size >= 4096 - 512)
+	{
 		printf("ROM too big\n");
 		abort();
 	}
@@ -100,7 +113,8 @@ int cpu_loadGame(char *filepath) {
 	
 	rewind(inputFile);
 	
-	for (int i = 0; i <= sizeof(buffer); i++) {
+	for (int i = 0; i < sizeof(buffer); i++)
+	{
 		buffer[i] = getc(inputFile);
 	}
 	
@@ -109,7 +123,8 @@ int cpu_loadGame(char *filepath) {
 	return 0;
 }
 
-void cpu_emulateCycle() {
+void cpu_emulate_cycle()
+{
 	//Fetch opcode
 	//Each opcode is two bytes, so we shift left by 8 to add zeros after the first byte
 	//Then AND the second byte to add it after the first byte
@@ -117,13 +132,16 @@ void cpu_emulateCycle() {
 	if (CPU_DEBUG) printDebug();
 	
 	//Decode opcode and execute
-	switch (mainCPU.currentOP & 0xF000) { //Compare the FIRST 4 bits
+	switch (mainCPU.currentOP & 0xF000) //Compare the FIRST 4 bits
+	{
 		case 0x0000:
 			//In some cases the first 4 bits don't tell us the opcode, in that case check the last 4 bits
-			switch (mainCPU.currentOP & 0x000F) { //Compare the LAST 4 bits
+			switch (mainCPU.currentOP & 0x000F) //Compare the LAST 4 bits
+		{
 				case 0x0000: // 0x00E0: Clear the screen
 					//Execute
-					for (int i = 0; i <= sizeof(mainCPU.display); i++) {
+					for (int i = 0; i < sizeof(mainCPU.display); i++)
+					{
 						mainCPU.display[i] = 0x0;
 					}
 					mainCPU.drawFlag = true;
@@ -186,7 +204,8 @@ void cpu_emulateCycle() {
 			break;
 			
 		case 0x8000: //0x8000 has 9 different opcodes, so we check the last 4 bits again to see which one it is
-			switch (mainCPU.currentOP & 0x000F) {
+			switch (mainCPU.currentOP & 0x000F)
+			{
 				case 0x0000: // 0x8XY0: Set VX to the value of VY
 					mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] = mainCPU.V[(mainCPU.currentOP & 0x00F0) >> 4];
 					mainCPU.progCounter += 2;
@@ -276,11 +295,15 @@ void cpu_emulateCycle() {
 				unsigned short pixel;
 				
 				mainCPU.V[0xF] = 0; //No collision by default
-				for (int yline = 0; yline < height; yline++) {
+				for (int yline = 0; yline < height; yline++)
+				{
 					pixel = mainCPU.memory[mainCPU.I + yline];
-					for (int xline = 0; xline < 8; xline++) {
-						if ((pixel & (0x80 >> xline)) != 0) {
-							if (mainCPU.display[(x + xline + ((y + yline) * 64))] == 1) {
+					for (int xline = 0; xline < 8; xline++)
+					{
+						if ((pixel & (0x80 >> xline)) != 0)
+						{
+							if (mainCPU.display[(x + xline + ((y + yline) * 64))] == 1)
+							{
 								mainCPU.V[0xF] = 1; //Collision happened
 							}
 							//FIXME: VBRIX crashes here on 0xDAB1
@@ -300,7 +323,8 @@ void cpu_emulateCycle() {
 			break;
 			
 		case 0xE000: //Input opcodes
-			switch (mainCPU.currentOP & 0x00FF) {
+			switch (mainCPU.currentOP & 0x00FF)
+			{
 				case 0x009E: // 0xEX9E: Skip the next instruction if the key stored in VX is pressed
 					if (mainCPU.key[(mainCPU.currentOP & 0x0F00) >> 8] != 0)
 						mainCPU.progCounter += 4;
@@ -330,8 +354,10 @@ void cpu_emulateCycle() {
 				case 0x000A: // 0xFX0A: Wait for key press, then store in VX
 					{
 						bool keyPressed = false;
-						for (int i = 0; i <= 16; i++) {
-							if (mainCPU.key[i] != 0) {
+						for (int i = 0; i < 16; i++)
+						{
+							if (mainCPU.key[i] != 0)
+							{
 								mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] = i;
 								keyPressed = true;
 							}
@@ -368,14 +394,16 @@ void cpu_emulateCycle() {
 					mainCPU.progCounter += 2;
 					break;
 				case 0x0055: // 0xFX55: Store V0 to VX (Including VX) in memory starting at address I
-					for (int i = 0; i <= ((mainCPU.currentOP & 0x0F00) >> 8); i++) {
+					for (int i = 0; i <= ((mainCPU.currentOP & 0x0F00) >> 8); i++)
+					{
 						mainCPU.memory[mainCPU.I + i] = mainCPU.V[i];
 					}
 					mainCPU.I += ((mainCPU.currentOP & 0x0F00) >> 8) + 1;
 					mainCPU.progCounter += 2;
 					break;
 				case 0x0065: // 0xFX65: Fill V0 to VX (Including VX) with values from memory starting at address I
-					for (int i = 0; i <= ((mainCPU.currentOP & 0x0F00) >> 8); i++) {
+					for (int i = 0; i <= ((mainCPU.currentOP & 0x0F00) >> 8); i++)
+					{
 						mainCPU.V[i] = mainCPU.memory[mainCPU.I + i];
 					}
 					mainCPU.progCounter += 2;
@@ -395,10 +423,12 @@ void cpu_emulateCycle() {
 	}
 	
 	//Update timers
-	if (mainCPU.delay_timer != 0) {
+	if (mainCPU.delay_timer != 0)
+	{
 		mainCPU.delay_timer--;
 	}
-	if (mainCPU.sound_timer != 0) {
+	if (mainCPU.sound_timer != 0)
+	{
 		if (mainCPU.sound_timer == 1)
 			printf("BEEP!\n"); //TODO: Make this beep :D
 		mainCPU.sound_timer--;
@@ -406,38 +436,50 @@ void cpu_emulateCycle() {
 }
 
 
-bool cpu_isDrawFlagSet() {
-	if (mainCPU.drawFlag) {
+bool cpu_is_drawflag_set()
+{
+	if (mainCPU.drawFlag)
+	{
 		mainCPU.drawFlag = false;
 		return true;
-	} else {
+	}
+	else
+	{
 		return false;
 	}
 }
 
 
-void cpu_setKeys(byte key) {
-	if (key == 0xFF) {
-		for (int i = 0; i <= 15; i++) {
+void cpu_set_keys(byte key)
+{
+	if (key == 0xFF)
+	{
+		for (int i = 0; i < 16; i++)
+		{
 			mainCPU.key[i] = 0;
 		}
-	} else {
+	}
+	else
+	{
 		mainCPU.key[key] = 1;
 	}
 }
 
 //Debug logger
-void printDebug() {
+void print_debug()
+{
 	//Print progCounter
 	printf("PC:0x%X", mainCPU.progCounter);
 	//Print current op
 	printf(" OP: 0x%X ", mainCPU.currentOP);
 	//Decode and print what op does
 	
-	switch (mainCPU.currentOP & 0xF000) { //Compare the FIRST 4 bits
+	switch (mainCPU.currentOP & 0xF000) //Compare the FIRST 4 bits
+	{
 		case 0x0000:
 			//In some cases the first 4 bits don't tell us the opcode, in that case check the last 4 bits
-			switch (mainCPU.currentOP & 0x000F) { //Compare the LAST 4 bits
+			switch (mainCPU.currentOP & 0x000F) //Compare the LAST 4 bits
+			{
 				case 0x0000: // 0x00E0: Clear the screen
 					printf("0x00E0: Clear the screen");
 					break;
@@ -481,7 +523,8 @@ void printDebug() {
 			break;
 			
 		case 0x8000: //0x8000 has 9 different opcodes, so we check the last 4 bits again to see which one it is
-			switch (mainCPU.currentOP & 0x000F) {
+			switch (mainCPU.currentOP & 0x000F)
+			{
 				case 0x0000: // 0x8XY0: Set VX to the value of VY
 					printf("0x8XY0: Set VX to the value of VY");
 					break;
@@ -538,7 +581,8 @@ void printDebug() {
 			break;
 			
 		case 0xE000: //Input opcodes
-			switch (mainCPU.currentOP & 0x00FF) {
+			switch (mainCPU.currentOP & 0x00FF)
+			{
 				case 0x009E: // 0xEX9E: Skip the next instruction if the key stored in VX is pressed
 					printf("0xEX9E: Skip the next instruction if the key stored in VX is pressed");
 					break;
@@ -554,7 +598,8 @@ void printDebug() {
 			break;
 			
 		case 0xF000:
-			switch (mainCPU.currentOP & 0x00FF) {
+			switch (mainCPU.currentOP & 0x00FF)
+			{
 				case 0x0007: // 0xFX07: Set VX to the value of the delay timer
 					printf("0xFX07: Set VX to the value of the delay timer");
 					break;
