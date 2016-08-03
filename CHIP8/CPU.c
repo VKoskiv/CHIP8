@@ -8,8 +8,6 @@
 
 #include "CPU.h"
 
-#define CPU_DEBUG false
-
 //The Chip-8 font set includes numvers from 0 to 9, and ABCDEF
 //Only the first four bits are used for drawing a number or character
 //So the first four bits from each of these columns is drawn under each other, to form the character
@@ -162,6 +160,9 @@ void cpu_emulate_cycle()
 			
 		case 0x1000: // 0x1NNN: Jump to address NNN
 			//Don't increment the program counter because we're jumping to an address
+			//Debug autohalt, automatically hault execution if infinite loop is detected
+			if (CPU_DEBUG && ((mainCPU.progCounter & 0x0FFF) == (mainCPU.currentOP & 0x0FFF)))
+				abort();
 			mainCPU.progCounter = mainCPU.currentOP & 0x0FFF;
 			break;
 			
@@ -306,7 +307,6 @@ void cpu_emulate_cycle()
 							{
 								mainCPU.V[0xF] = 1; //Collision happened
 							}
-							int pixelindex = (((y + yline) % 32) * 64) + ((x + xline) % 64);
 							mainCPU.display[((x + xline) % 64) + (((y + yline) % 32) * 64)] ^= 1;
 						}
 					}

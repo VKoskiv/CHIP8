@@ -10,9 +10,6 @@
 #include "CPU.h"
 #include <time.h>
 
-#define delayEnabled true
-#define milliseconds 2
-
 typedef unsigned char byte;
 
 void destroy_window(SDL_Window *window)
@@ -206,7 +203,7 @@ int main(int argc, const char * argv[])
 	
 	//Initialize the emulator
 	cpu_initialize();
-	if (cpu_load_game("c8games/MAZE") == -1)
+	if (cpu_load_game("c8games/TETRIS") == -1)
 	{
 		printf("Couldn't find the ROM file! (Check working dir/path)\n");
 		return 0;
@@ -224,14 +221,20 @@ int main(int argc, const char * argv[])
 		
 		set_input();
 		
-		if (delayEnabled)
+		struct timespec ts;
+		int ms;
+		
+		if (CPU_DEBUG && delayEnabled)
 		{
-			struct timespec ts;
-			int ms = milliseconds;
-			ts.tv_sec = ms / 1000;
-			ts.tv_nsec = (ms % 1000) * 1000000;
-			nanosleep(&ts, NULL);
+			ms = delayDebug;
 		}
+		else
+		{
+			ms = delayNormal;
+		}
+		ts.tv_sec = ms / 1000;
+		ts.tv_nsec = (ms % 1000) * 1000000;
+		nanosleep(&ts, NULL);
 	}
 	
 	return 4;
