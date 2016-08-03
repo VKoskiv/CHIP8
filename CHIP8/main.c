@@ -85,37 +85,55 @@ void setInput() {
 	const Uint8 *keys = SDL_GetKeyboardState(NULL);
 	byte input = 0xFF;
 	
+	//Prevent keys from sticking when pressing more than one at a time
+	cpu_setKeys(0xFF);
+	
 	if (keys[SDL_SCANCODE_1]) {
 		input = 0x1;
-	} else if (keys[SDL_SCANCODE_2]) {
+	}
+	if (keys[SDL_SCANCODE_2]) {
 		input = 0x2;
-	} else if (keys[SDL_SCANCODE_3]) {
+	}
+	if (keys[SDL_SCANCODE_3]) {
 		input = 0x3;
-	} else if (keys[SDL_SCANCODE_4]) {
+	}
+	if (keys[SDL_SCANCODE_4]) {
 		input = 0xC;
-	} else if (keys[SDL_SCANCODE_Q]) {
+	}
+	if (keys[SDL_SCANCODE_Q]) {
 		input = 0x4;
-	} else if (keys[SDL_SCANCODE_W]) {
+	}
+	if (keys[SDL_SCANCODE_W]) {
 		input = 0x5;
-	} else if (keys[SDL_SCANCODE_E]) {
+	}
+	if (keys[SDL_SCANCODE_E]) {
 		input = 0x6;
-	} else if (keys[SDL_SCANCODE_R]) {
+	}
+	if (keys[SDL_SCANCODE_R]) {
 		input = 0xD;
-	} else if (keys[SDL_SCANCODE_A]) {
+	}
+	if (keys[SDL_SCANCODE_A]) {
 		input = 0x7;
-	} else if (keys[SDL_SCANCODE_S]) {
+	}
+	if (keys[SDL_SCANCODE_S]) {
 		input = 0x8;
-	} else if (keys[SDL_SCANCODE_D]) {
+	}
+	if (keys[SDL_SCANCODE_D]) {
 		input = 0x9;
-	} else if (keys[SDL_SCANCODE_F]) {
+	}
+	if (keys[SDL_SCANCODE_F]) {
 		input = 0xE;
-	} else if (keys[SDL_SCANCODE_Z]) {
+	}
+	if (keys[SDL_SCANCODE_Z]) {
 		input = 0xA;
-	} else if (keys[SDL_SCANCODE_X]) {
+	}
+	if (keys[SDL_SCANCODE_X]) {
 		input = 0x0;
-	} else if (keys[SDL_SCANCODE_C]) {
+	}
+	if (keys[SDL_SCANCODE_C]) {
 		input = 0xB;
-	} else if (keys[SDL_SCANCODE_V]) {
+	}
+	if (keys[SDL_SCANCODE_V]) {
 		input = 0xF;
 	}
 
@@ -156,7 +174,10 @@ int main(int argc, const char * argv[]) {
 	
 	//Initialize the emulator
 	cpu_initialize();
-	cpu_loadGame("c8games/VBRIX");
+	if (cpu_loadGame("c8games/VBRIX") == -1) {
+		printf("Couldn't find the ROM file! (Check working dir/path)\n");
+		abort();
+	}
 	
 	//Emulation loop
 	for (;;) {

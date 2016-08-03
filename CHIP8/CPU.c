@@ -90,17 +90,22 @@ int cpu_loadGame(char *filepath) {
 	}
 	fseek(inputFile, 0L, SEEK_END);
 	long size = ftell(inputFile);
+	
+	//Check file size
+	if (size >= 4096 - 512) {
+		printf("ROM too big\n");
+		abort();
+	}
 	unsigned char buffer[size];
+	
 	rewind(inputFile);
 	
-	for (int i = 0; i <= size; i++) {
+	for (int i = 0; i <= sizeof(buffer); i++) {
 		buffer[i] = getc(inputFile);
 	}
 	
-	
-	for (int i = 0; i <= sizeof(buffer); i++) {
-		mainCPU.memory[i + 512] = buffer[i]; //0x200 == 512, which is where the CPU starts execution
-	}
+	//Copy starting from 0x200 == 512, which is where the CPU starts execution
+	memcpy(mainCPU.memory + 512, buffer, sizeof(buffer));
 	return 0;
 }
 
@@ -255,7 +260,7 @@ void cpu_emulateCycle() {
 			
 		case 0xB000: // 0xBNNN: Jump to the address NNN plus V0
 			//FIXME: I don't think we increment here!
-			mainCPU.progCounter = ((mainCPU.currentOP & 0x0FFF) >> 8) + mainCPU.V[0];
+			mainCPU.progCounter = (mainCPU.currentOP & 0x0FFF) + mainCPU.V[0];
 			break;
 		
 		case 0xC000: // 0xCXNN: Set VX to the result of a bitwise and operation on a random number and NN
@@ -413,7 +418,7 @@ bool cpu_isDrawFlagSet() {
 
 void cpu_setKeys(byte key) {
 	if (key == 0xFF) {
-		for (int i = 0; i <= 16; i++) {
+		for (int i = 0; i <= 15; i++) {
 			mainCPU.key[i] = 0;
 		}
 	} else {
