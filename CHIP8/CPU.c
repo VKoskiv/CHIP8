@@ -187,15 +187,15 @@ void cpu_emulateCycle() {
 					mainCPU.progCounter += 2;
 					break;
 				case 0x0001: // 0x8XY1: Set VX to VX or VY
-					mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] = (mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] | mainCPU.V[(mainCPU.currentOP & 0x00F0) >> 4]);
+					mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] |= (mainCPU.V[(mainCPU.currentOP & 0x00F0) >> 4]);
 					mainCPU.progCounter += 2;
 					break;
 				case 0x0002: // 0x8XY2: Set VX to VX and VY
-					mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] = (mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] & mainCPU.V[(mainCPU.currentOP & 0x00F0) >> 4]);
+					mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] &= (mainCPU.V[(mainCPU.currentOP & 0x00F0) >> 4]);
 					mainCPU.progCounter += 2;
 					break;
 				case 0x0003: // 0x8XY3: Set VX to VX xor VY
-					mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] = (mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] ^ mainCPU.V[(mainCPU.currentOP & 0x00F0) >> 4]);
+					mainCPU.V[(mainCPU.currentOP & 0x0F00) >> 8] ^= (mainCPU.V[(mainCPU.currentOP & 0x00F0) >> 4]);
 					mainCPU.progCounter += 2;
 					break;
 				case 0x0004: // 0x8XY4: Add VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't
@@ -254,8 +254,7 @@ void cpu_emulateCycle() {
 			break;
 			
 		case 0xB000: // 0xBNNN: Jump to the address NNN plus V0
-			//FIXME: I don't think we increment here!
-			mainCPU.progCounter = ((mainCPU.currentOP & 0x0FFF) >> 8) + mainCPU.V[0];
+			mainCPU.progCounter = (mainCPU.currentOP & 0x0FFF) + mainCPU.V[0];
 			break;
 		
 		case 0xC000: // 0xCXNN: Set VX to the result of a bitwise and operation on a random number and NN
