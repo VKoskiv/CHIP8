@@ -6,6 +6,7 @@
 //  Copyright © 2016 Valtteri Koskivuori. All rights reserved.
 //
 
+#include <assert.h>
 #include "CPU.h"
 
 //The Chip-8 font set includes numvers from 0 to 9, and ABCDEF
@@ -93,7 +94,7 @@ void get_current_frame(char *buf, int count)
 int cpu_load_game(char *filepath)
 {
 	
-	FILE *inputFile = fopen(filepath, "r");
+	FILE *inputFile = fopen(filepath, "rb");
 	if (!inputFile)
 	{
 		return -1;
@@ -390,7 +391,7 @@ void cpu_emulate_cycle()
 					mainCPU.progCounter += 2;
 					break;
 				case 0x0055: // 0xFX55: Store V0 to VX (Including VX) in memory starting at address I
-					for (int i = 0; i < ((mainCPU.currentOP & 0x0F00) >> 8); i++)
+					for (int i = 0; i <= ((mainCPU.currentOP & 0x0F00) >> 8); i++)
 					{
 						mainCPU.memory[mainCPU.I + i] = mainCPU.V[i];
 					}
@@ -398,7 +399,7 @@ void cpu_emulate_cycle()
 					mainCPU.progCounter += 2;
 					break;
 				case 0x0065: // 0xFX65: Fill V0 to VX (Including VX) with values from memory starting at address I
-					for (int i = 0; i < ((mainCPU.currentOP & 0x0F00) >> 8); i++)
+					for (int i = 0; i <= ((mainCPU.currentOP & 0x0F00) >> 8); i++)
 					{
 						mainCPU.V[i] = mainCPU.memory[mainCPU.I + i];
 					}
