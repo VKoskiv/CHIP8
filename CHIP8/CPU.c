@@ -148,8 +148,7 @@ void cpu_emulate_cycle()
 					break;
 				case 0x000E: // 0x00EE: Return from subroutine
 					--mainCPU.stackPointer;
-					mainCPU.progCounter = mainCPU.stack[mainCPU.stackPointer];
-					mainCPU.progCounter += 2;
+				mainCPU.progCounter = mainCPU.stack[mainCPU.stackPointer];
 					break;
 					
 				default:
@@ -169,6 +168,7 @@ void cpu_emulate_cycle()
 			
 		case 0x2000: // 0x2NNN: Call subroutine at NNN
 			//Since we're calling a subroutine at a specific address, we don't increase program counter by 2
+			mainCPU.progCounter += 2;
 			mainCPU.stack[mainCPU.stackPointer] = mainCPU.progCounter;
 			++mainCPU.stackPointer;
 			mainCPU.progCounter = mainCPU.currentOP & 0x0FFF;
