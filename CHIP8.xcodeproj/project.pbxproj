@@ -10,7 +10,7 @@
 		8DF400941D4BD71900471BFF /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 8DF400931D4BD71900471BFF /* main.c */; };
 		8DF4009B1D4BD74100471BFF /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DF4009A1D4BD74100471BFF /* SDL2.framework */; };
 		8DF4009E1D4BE30D00471BFF /* CPU.c in Sources */ = {isa = PBXBuildFile; fileRef = 8DF4009C1D4BE30D00471BFF /* CPU.c */; };
-		8DF400A21D4BE82E00471BFF /* cpuObj.c in Sources */ = {isa = PBXBuildFile; fileRef = 8DF400A01D4BE82E00471BFF /* cpuObj.c */; };
+		901151551D9A3E0F0094B593 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 901151541D9A3E0F0094B593 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -31,8 +31,7 @@
 		8DF4009A1D4BD74100471BFF /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../../../../../Library/Frameworks/SDL2.framework; sourceTree = "<group>"; };
 		8DF4009C1D4BE30D00471BFF /* CPU.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CPU.c; sourceTree = "<group>"; };
 		8DF4009D1D4BE30D00471BFF /* CPU.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPU.h; sourceTree = "<group>"; };
-		8DF400A01D4BE82E00471BFF /* cpuObj.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cpuObj.c; sourceTree = "<group>"; };
-		8DF400A11D4BE82E00471BFF /* cpuObj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cpuObj.h; sourceTree = "<group>"; };
+		901151541D9A3E0F0094B593 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,8 +69,7 @@
 				8DF400931D4BD71900471BFF /* main.c */,
 				8DF4009C1D4BE30D00471BFF /* CPU.c */,
 				8DF4009D1D4BE30D00471BFF /* CPU.h */,
-				8DF400A01D4BE82E00471BFF /* cpuObj.c */,
-				8DF400A11D4BE82E00471BFF /* cpuObj.h */,
+				901151541D9A3E0F0094B593 /* README.md */,
 			);
 			path = CHIP8;
 			sourceTree = "<group>";
@@ -132,7 +130,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8DF400A21D4BE82E00471BFF /* cpuObj.c in Sources */,
+				901151551D9A3E0F0094B593 /* README.md in Sources */,
 				8DF4009E1D4BE30D00471BFF /* CPU.c in Sources */,
 				8DF400941D4BD71900471BFF /* main.c in Sources */,
 			);
@@ -263,6 +261,7 @@
 				8DF400991D4BD71900471BFF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

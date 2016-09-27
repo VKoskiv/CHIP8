@@ -171,7 +171,8 @@ int main(int argc, const char * argv[])
 {
 	int windowWidth = 64;
 	int windowHeight = 32;
-	int windowScale = 4;
+	int windowScale = 16;
+	bool running = true;
 	
 	SDL_Window *window = NULL;
 	SDL_Renderer *renderer = NULL;
@@ -210,8 +211,7 @@ int main(int argc, const char * argv[])
 	}
 	
 	//Emulation loop
-	for (;;)
-	{
+	do {
 		cpu_emulate_cycle();
 		
 		if (cpu_is_drawflag_set())
@@ -235,7 +235,7 @@ int main(int argc, const char * argv[])
 		ts.tv_sec = ms / 1000;
 		ts.tv_nsec = (ms % 1000) * 1000000;
 		nanosleep(&ts, NULL);
-	}
+	} while (running);
 	
 	return 4;
 }
