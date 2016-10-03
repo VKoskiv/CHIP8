@@ -10,7 +10,22 @@
 #include "CPU.h"
 #include <time.h>
 
+bool running = true;
+
 typedef unsigned char byte;
+
+void (*signal(int signo, void (*func )(int)))(int);
+typedef void sigfunc(int);
+sigfunc *signal(int, sigfunc*);
+
+void sig_handler(int sig)
+{
+	if (sig == SIGINT)
+	{
+		running = false;
+	}
+	
+}
 
 void destroy_window(SDL_Window *window)
 {
@@ -172,7 +187,6 @@ int main(int argc, const char * argv[])
 	int windowWidth = 64;
 	int windowHeight = 32;
 	int windowScale = 16;
-	bool running = true;
 	
 	SDL_Window *window = NULL;
 	SDL_Renderer *renderer = NULL;
@@ -212,6 +226,10 @@ int main(int argc, const char * argv[])
 	
 	//Emulation loop
 	do {
+		
+		if (signal(SIGINT, sig_handler) == SIG_ERR)
+			printf("Couldn't catch SIGINT\n");
+		
 		cpu_emulate_cycle();
 		
 		if (cpu_is_drawflag_set())

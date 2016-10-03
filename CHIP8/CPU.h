@@ -15,9 +15,9 @@
 #include <memory.h>
 
 //CPU debug mode prints a log of opcodes, and enables autohalt
-#define CPU_DEBUG true
+#define CPU_DEBUG false
 //If CPU debug and delayEnabled is true, use delayDebug
-#define delayEnabled true
+#define delayEnabled false
 
 #define delayNormal 2
 #define delayDebug  200
