@@ -59,7 +59,7 @@ typedef struct
 } chipCPU;
 
 void cpu_initialize();
-int cpu_load_game(char *filepath);
+int cpu_load_rom(char *filepath);
 void cpu_emulate_cycle();
 void get_current_frame(char *buf, int count);
 bool cpu_is_drawflag_set();

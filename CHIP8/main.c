@@ -186,7 +186,7 @@ int main(int argc, const char * argv[])
 {
 	int windowWidth = 64;
 	int windowHeight = 32;
-	int windowScale = 16;
+	int windowScale = 16; //How big the pixels are
 	
 	SDL_Window *window = NULL;
 	SDL_Renderer *renderer = NULL;
@@ -218,10 +218,20 @@ int main(int argc, const char * argv[])
 	
 	//Initialize the emulator
 	cpu_initialize();
-	if (cpu_load_game("c8games/TETRIS") == -1)
-	{
-		printf("Couldn't find the ROM file! (Check working dir/path)\n");
-		return 0;
+	
+	switch (cpu_load_rom("c8games/TETRIS")) {
+		case -1:
+			fprintf(stdout, "Couldn't find the ROM file! (Check working dir/path)\n");
+			return -1;
+			break;
+		case -2:
+			fprintf(stdout, "ROM too big\n");
+			return -1;
+			break;
+			
+		default:
+			fprintf(stdout, " bytes loaded.\n");
+			break;
 	}
 	
 	//Emulation loop
@@ -255,5 +265,8 @@ int main(int argc, const char * argv[])
 		nanosleep(&ts, NULL);
 	} while (running);
 	
-	return 4;
+	destroy_renderer(renderer);
+	destroy_window(window);
+	
+	return 0;
 }

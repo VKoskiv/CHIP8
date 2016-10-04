@@ -91,7 +91,7 @@ void get_current_frame(char *buf, int count)
 	}
 }
 
-int cpu_load_game(char *filepath)
+int cpu_load_rom(char *filepath)
 {
 	
 	FILE *inputFile = fopen(filepath, "rb");
@@ -101,12 +101,12 @@ int cpu_load_game(char *filepath)
 	}
 	fseek(inputFile, 0L, SEEK_END);
 	long size = ftell(inputFile);
+	fprintf(stdout, "%ld", size);
 	
 	//Check file size
 	if (size >= 4096 - 512)
 	{
-		printf("ROM too big\n");
-		abort();
+		return -2;
 	}
 	unsigned char buffer[size];
 	
@@ -148,6 +148,7 @@ void cpu_emulate_cycle()
 					break;
 				case 0x000E: // 0x00EE: Return from subroutine
 					--mainCPU.stackPointer;
+				//Pop PC off the stack and continue executing
 				mainCPU.progCounter = mainCPU.stack[mainCPU.stackPointer];
 					break;
 					
@@ -167,7 +168,7 @@ void cpu_emulate_cycle()
 			break;
 			
 		case 0x2000: // 0x2NNN: Call subroutine at NNN
-			//Since we're calling a subroutine at a specific address, we don't increase program counter by 2
+			//Increment PC before saving it into stack, so when returning, we can just pop the PC and continue executing
 			mainCPU.progCounter += 2;
 			mainCPU.stack[mainCPU.stackPointer] = mainCPU.progCounter;
 			++mainCPU.stackPointer;
@@ -420,6 +421,7 @@ void cpu_emulate_cycle()
 	}
 	
 	//Update timers
+	//FIXME: Delay timers should be decremented at 60hz regardless of the CPU cycle speed.
 	if (mainCPU.delay_timer != 0)
 	{
 		mainCPU.delay_timer--;
