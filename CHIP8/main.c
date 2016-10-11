@@ -219,7 +219,7 @@ int main(int argc, const char * argv[])
 	//Initialize the emulator
 	cpu_initialize();
 	
-	switch (cpu_load_rom("c8games/TETRIS")) {
+	switch (cpu_load_rom("c8games/BRIX")) {
 		case -1:
 			fprintf(stdout, "Couldn't find the ROM file! (Check working dir/path)\n");
 			return -1;

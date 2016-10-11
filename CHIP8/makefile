@@ -1,8 +1,8 @@
 EXE_NAME = chip
 OBJS = CPU.o main.o
 CC = gcc
-FLAGS = -I/Library/Frameworks/SDL2.framework/Headers -F/Library/Frameworks -framework SDL2 -Wall -O2
-LIBS = -lm
+FLAGS = -Wall -O2
+LIBS = -lSDL2
 
 .c.o:
 	$(CC) $< -c $(FLAGS) $(INC)
