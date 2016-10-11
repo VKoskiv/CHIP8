@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <memory.h>
+#include <signal.h>
 
 //CPU debug mode prints a log of opcodes, and enables autohalt
 #define CPU_DEBUG false
