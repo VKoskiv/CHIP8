@@ -66,7 +66,7 @@ void render(SDL_Renderer *renderer)
 		{
 			if (data[(y*64) + x] == 0)
 			{
-				//Don't draw
+				//Don't draw ¯\_(ツ)_/¯
 			} else
 			{
 				SDL_RenderDrawPoint(renderer, x, y);
@@ -195,7 +195,7 @@ int main(int argc, const char * argv[])
 	//Init SDL
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
 	{
-		printf("SDL couldn't initialize, error %s",SDL_GetError());
+		fprintf(stdout, "SDL couldn't initialize, error %s",SDL_GetError());
 		return false;
 	}
 	
@@ -203,7 +203,7 @@ int main(int argc, const char * argv[])
 	window = SDL_CreateWindow("CHIP-8 by VKoskiv 2016", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth * windowScale, windowHeight * windowScale, SDL_WINDOW_SHOWN);
 	if (window == NULL)
 	{
-		printf("Window couldn't be created, error %s", SDL_GetError());
+		fprintf(stdout, "Window couldn't be created, error %s", SDL_GetError());
 		return false;
 	}
 	
@@ -211,7 +211,7 @@ int main(int argc, const char * argv[])
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (renderer == NULL)
 	{
-		printf("Renderer couldn't be created, error %s", SDL_GetError());
+		fprintf(stdout, "Renderer couldn't be created, error %s", SDL_GetError());
 		return false;
 	}
 	SDL_RenderSetScale(renderer, windowScale, windowScale);

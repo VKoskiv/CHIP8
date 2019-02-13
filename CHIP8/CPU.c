@@ -153,7 +153,7 @@ void cpu_emulate_cycle()
 					break;
 					
 				default:
-					printf("Unknown opcode [0x0000]: 0x%X\n", mainCPU.currentOP);
+					fprintf(stderr, "Unknown opcode [0x0000]: 0x%X\n", mainCPU.currentOP);
 					abort();
 					break;
 			}
@@ -262,7 +262,7 @@ void cpu_emulate_cycle()
 					break;
 					
 				default:
-					printf("Unknown opcode [0x8000]: 0x%X", mainCPU.currentOP);
+					fprintf(stderr, "Unknown opcode [0x8000]: 0x%X", mainCPU.currentOP);
 					abort();
 					break;
 			}
@@ -337,7 +337,7 @@ void cpu_emulate_cycle()
 					break;
 					
 				default:
-					printf("Unknown opcode [0xE000]: 0x%X", mainCPU.currentOP);
+					fprintf(stderr, "Unknown opcode [0xE000]: 0x%X", mainCPU.currentOP);
 					abort();
 					break;
 			}
@@ -408,14 +408,14 @@ void cpu_emulate_cycle()
 					break;
 					
 				default:
-					printf("Unknown opcode: 0x%X\n", mainCPU.currentOP);
+					fprintf(stderr, "Unknown opcode: 0x%X\n", mainCPU.currentOP);
 					abort();
 					break;
 			}
 			break;
 			
 		default:
-			printf("Unknown opcode: 0x%X\n", mainCPU.currentOP);
+			fprintf(stderr, "Unknown opcode: 0x%X\n", mainCPU.currentOP);
 			abort();
 			break;
 	}
@@ -429,7 +429,7 @@ void cpu_emulate_cycle()
 	if (mainCPU.sound_timer != 0)
 	{
 		if (mainCPU.sound_timer == 1)
-			printf("BEEP!\n"); //TODO: Make this beep :D
+			fprintf(stdout, "BEEP!\n"); //TODO: Make this beep :D
 		mainCPU.sound_timer--;
 	}
 }
@@ -468,9 +468,9 @@ void cpu_set_keys(byte key)
 void print_debug()
 {
 	//Print progCounter
-	printf("PC:0x%X", mainCPU.progCounter);
+	fprintf(stdout,"PC:0x%X", mainCPU.progCounter);
 	//Print current op
-	printf(" OP: 0x%X ", mainCPU.currentOP);
+	fprintf(stdout," OP: 0x%X ", mainCPU.currentOP);
 	//Decode and print what op does
 	
 	switch (mainCPU.currentOP & 0xF000) //Compare the FIRST 4 bits
@@ -480,117 +480,117 @@ void print_debug()
 			switch (mainCPU.currentOP & 0x000F) //Compare the LAST 4 bits
 			{
 				case 0x0000: // 0x00E0: Clear the screen
-					printf("0x00E0: Clear the screen");
+					fprintf(stdout,"0x00E0: Clear the screen");
 					break;
 				case 0x000E: // 0x00EE: Return from subroutine
-					printf("0x00EE: Return from subroutine");
+					fprintf(stdout,"0x00EE: Return from subroutine");
 					break;
 					
 				default:
-					printf("Unknown opcode [0x0000]: 0x%X\n", mainCPU.currentOP);
+					fprintf(stderr,"Unknown opcode [0x0000]: 0x%X\n", mainCPU.currentOP);
 					abort();
 					break;
 			}
 			break;
 			
 		case 0x1000: // 0x1NNN: Jump to address NNN
-			printf("0x1NNN: Jump to address NNN");
+			fprintf(stdout,"0x1NNN: Jump to address NNN");
 			break;
 			
 		case 0x2000: // 0x2NNN: Call subroutine at NNN
-			printf("0x2NNN: Call subroutine at NNN");
+			fprintf(stdout,"0x2NNN: Call subroutine at NNN");
 			break;
 			
 		case 0x3000: // 0x3XNN: Skip the next instruction if VX equals NN
-			printf("0x3XNN: Skip the next instruction if VX equals NN");
+			fprintf(stdout,"0x3XNN: Skip the next instruction if VX equals NN");
 			break;
 			
 		case 0x4000: // 0x4XNN: Skip the next instruction if VX doesn't equal NN
-			printf("0x4XNN: Skip the next instruction if VX doesn't equal NN");
+			fprintf(stdout,"0x4XNN: Skip the next instruction if VX doesn't equal NN");
 			break;
 			
 		case 0x5000: // 0x5XY0: Skip the next instruction if VX equals VY
-			printf("0x5XY0: Skip the next instruction if VX equals VY");
+			fprintf(stdout,"0x5XY0: Skip the next instruction if VX equals VY");
 			break;
 			
 		case 0x6000: // 0x6XNN: Set VX to NN
-			printf("0x6XNN: Set VX to NN");
+			fprintf(stdout,"0x6XNN: Set VX to NN");
 			break;
 			
 		case 0x7000: // 0x7XNN: Add NN to VX
-			printf("0x7XNN: Add NN to VX");
+			fprintf(stdout,"0x7XNN: Add NN to VX");
 			break;
 			
 		case 0x8000: //0x8000 has 9 different opcodes, so we check the last 4 bits again to see which one it is
 			switch (mainCPU.currentOP & 0x000F)
 			{
 				case 0x0000: // 0x8XY0: Set VX to the value of VY
-					printf("0x8XY0: Set VX to the value of VY");
+					fprintf(stdout,"0x8XY0: Set VX to the value of VY");
 					break;
 				case 0x0001: // 0x8XY1: Set VX to VX or VY
-					printf("0x8XY1: Set VX to VX or VY");
+					fprintf(stdout,"0x8XY1: Set VX to VX or VY");
 					break;
 				case 0x0002: // 0x8XY2: Set VX to VX and VY
-					printf("0x8XY2: Set VX to VX and VY");
+					fprintf(stdout,"0x8XY2: Set VX to VX and VY");
 					break;
 				case 0x0003: // 0x8XY3: Set VX to VX xor VY
-					printf("0x8XY3: Set VX to VX xor VY");
+					fprintf(stdout,"0x8XY3: Set VX to VX xor VY");
 					break;
 				case 0x0004: // 0x8XY4: Add VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't
-					printf("0x8XY4: Add VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't");
+					fprintf(stdout,"0x8XY4: Add VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't");
 					break;
 				case 0x0005: // 0x8XY5: VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't
-					printf("0x8XY5: VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't");
+					fprintf(stdout,"0x8XY5: VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't");
 					break;
 				case 0x0006: // 0x8XY6: Shift VX right by one. VF is set to the value of the least significant bit of VX before the shift
-					printf("0x8XY6: Shift VX right by one. VF is set to the value of the least significant bit of VX before the shift");
+					fprintf(stdout,"0x8XY6: Shift VX right by one. VF is set to the value of the least significant bit of VX before the shift");
 					break;
 				case 0x0007: // 0x8XY7: Set VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't
-					printf("0x8XY7: Set VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't");
+					fprintf(stdout,"0x8XY7: Set VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't");
 					break;
 				case 0x000E: // 0x8XYE: Shift VX left by one. VF is set to the value of the most significant bit of VX before the shift
-					printf("0x8XYE: Shift VX left by one. VF is set to the value of the most significant bit of VX before the shift");
+					fprintf(stdout,"0x8XYE: Shift VX left by one. VF is set to the value of the most significant bit of VX before the shift");
 					break;
 					
 				default:
-					printf("Unknown opcode [0x8000]: 0x%X", mainCPU.currentOP);
+					fprintf(stderr,"Unknown opcode [0x8000]: 0x%X", mainCPU.currentOP);
 					abort();
 					break;
 			}
 			break;
 			
 		case 0x9000: // 0x9XY0: Skip the next instruction if VX doesn't equal VY
-			printf("0x9XY0: Skip the next instruction if VX doesn't equal VY");
+			fprintf(stdout,"0x9XY0: Skip the next instruction if VX doesn't equal VY");
 			break;
 			
 		case 0xA000: // 0xANNN: Set I to the address NNN
-			printf("0xANNN: Set I to the address NNN");
+			fprintf(stdout,"0xANNN: Set I to the address NNN");
 			break;
 			
 		case 0xB000: // 0xBNNN: Jump to the address NNN plus V0
-			printf("0xBNNN: Jump to the address NNN plus V0");
+			fprintf(stdout,"0xBNNN: Jump to the address NNN plus V0");
 			break;
 			
 		case 0xC000: // 0xCXNN: Set VX to the result of a bitwise and operation on a random number and NN
-			printf("0xCXNN: Set VX to the result of a bitwise and operation on a random number and NN");
+			fprintf(stdout,"0xCXNN: Set VX to the result of a bitwise and operation on a random number and NN");
 			break;
 			
 		case 0xD000: // 0xDXYN: Draw a sprite at coordinate (VX,VY) that has a width of 8px and a height of Npx. Each row of 8 pixels is read as bit-coded starting from mem location I; I value doesn't change after the execution of this instruction. As described above, VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that doesn't happen
-			printf("0xDXYN: Draw a sprite at coordinate (VX,VY) that has a width of 8px and a height of Npx");
+			fprintf(stdout,"0xDXYN: Draw a sprite at coordinate (VX,VY) that has a width of 8px and a height of Npx");
 			break;
 			
 		case 0xE000: //Input opcodes
 			switch (mainCPU.currentOP & 0x00FF)
 			{
 				case 0x009E: // 0xEX9E: Skip the next instruction if the key stored in VX is pressed
-					printf("0xEX9E: Skip the next instruction if the key stored in VX is pressed");
+					fprintf(stdout,"0xEX9E: Skip the next instruction if the key stored in VX is pressed");
 					break;
 				case 0x00A1: // 0xEXA1: Skip the next instruction if the key stored in VX isn't pressed
-					printf("0xEXA1: Skip the next instruction if the key stored in VX isn't pressed");
+					fprintf(stdout,"0xEXA1: Skip the next instruction if the key stored in VX isn't pressed");
 					break;
 					
 				default:
-					printf("Unknown opcode [0xE000]: 0x%X", mainCPU.currentOP);
+					fprintf(stderr,"Unknown opcode [0xE000]: 0x%X", mainCPU.currentOP);
 					abort();
 					break;
 			}
@@ -600,48 +600,48 @@ void print_debug()
 			switch (mainCPU.currentOP & 0x00FF)
 			{
 				case 0x0007: // 0xFX07: Set VX to the value of the delay timer
-					printf("0xFX07: Set VX to the value of the delay timer");
+					fprintf(stdout,"0xFX07: Set VX to the value of the delay timer");
 					break;
 				case 0x000A: // 0xFX0A: Wait for key press, then store in VX
-					printf("0xFX0A: Wait for key press, then store in VX");
+					fprintf(stdout,"0xFX0A: Wait for key press, then store in VX");
 					break;
 				case 0x0015: // 0xFX15: Set the delay timer to VX
-					printf("0xFX15: Set the delay timer to VX");
+					fprintf(stdout,"0xFX15: Set the delay timer to VX");
 					break;
 				case 0x0018: // 0xFX18: Set the sound timer to VX
-					printf("0xFX18: Set the sound timer to VX");
+					fprintf(stdout,"0xFX18: Set the sound timer to VX");
 					break;
 				case 0x001E: // 0xFX1E: Add VX to I
-					printf("0xFX1E: Add VX to I");
+					fprintf(stdout,"0xFX1E: Add VX to I");
 					break;
 				case 0x0029: // 0xFX29: Set I to the location of the sprite for the character in VX. Characters 0-F in hex are represented by a 4x5 font (mainFontset)
-					printf("0xFX29: Set I to the location of the sprite for the character in VX");
+					fprintf(stdout,"0xFX29: Set I to the location of the sprite for the character in VX");
 					break;
 				case 0x0033: // 0xFX33: Store the binary-coded decimal representation of VX, with the most significant of three digits at the address I, in the middle digit at I+1, and the least significant digit at I+2. So basically take the decimal representation of VX, place the hundreds digit in memory at I, tens digit at I+1, and ones at I+2
-					printf("0xFX33: Store the binary-coded decimal representation of VX");
+					fprintf(stdout,"0xFX33: Store the binary-coded decimal representation of VX");
 					break;
 				case 0x0055: // 0xFX55: Store V0 to VX (Including VX) in memory starting at address I
-					printf("0xFX55: Store V0 to VX (Including VX) in memory starting at address I");
+					fprintf(stdout,"0xFX55: Store V0 to VX (Including VX) in memory starting at address I");
 					break;
 				case 0x0065: // 0xFX65: Fill V0 to VX (Including VX) with values from memory starting at address I
-					printf("0xFX65: Fill V0 to VX (Including VX) with values from memory starting at address I");
+					fprintf(stdout,"0xFX65: Fill V0 to VX (Including VX) with values from memory starting at address I");
 					break;
 					
 				default:
-					printf("Unknown opcode: 0x%X\n", mainCPU.currentOP);
+					fprintf(stderr,"Unknown opcode: 0x%X\n", mainCPU.currentOP);
 					abort();
 					break;
 			}
 			break;
 			
 		default:
-			printf("Unknown opcode: 0x%X\n", mainCPU.currentOP);
+			fprintf(stderr,"Unknown opcode: 0x%X\n", mainCPU.currentOP);
 			abort();
 			break;
 	}
 	
 	//Add newline
-	printf("\n");
+	fprintf(stdout,"\n");
 }
 
 
