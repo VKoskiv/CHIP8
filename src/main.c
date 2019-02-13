@@ -51,8 +51,7 @@ void destroy_texture(SDL_Texture *texture)
 	}
 }
 
-void render(SDL_Renderer *renderer)
-{
+void render(SDL_Renderer *renderer) {
 	//Clear the window
 	SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x0, 0x0);
 	SDL_RenderClear(renderer);
@@ -60,6 +59,7 @@ void render(SDL_Renderer *renderer)
 	//Render the data
 	char data[2048] = {0};
 	get_current_frame(data, 2048);
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
 	for (int y = 0; y < 32; ++y)
 	{
 		for (int x = 0; x < 64; ++x)
@@ -176,7 +176,7 @@ void set_input()
 	{
 		input = 0xF;
 	}
-
+	
 	cpu_set_keys(input);
 }
 
@@ -199,18 +199,22 @@ int main(int argc, const char * argv[])
 		return false;
 	}
 	
+	SDL_WindowFlags flags = SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI;
+	
 	//Init window
-	window = SDL_CreateWindow("CHIP-8 by VKoskiv 2016", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, windowWidth * windowScale, windowHeight * windowScale, SDL_WINDOW_SHOWN);
-	if (window == NULL)
-	{
+	window = SDL_CreateWindow("CHIP-8 by VKoskiv 2016-2019",
+							  SDL_WINDOWPOS_UNDEFINED,
+							  SDL_WINDOWPOS_UNDEFINED,
+							  windowWidth * (windowScale/2),
+							  windowHeight * (windowScale/2), flags);
+	if (window == NULL) {
 		fprintf(stdout, "Window couldn't be created, error %s", SDL_GetError());
 		return false;
 	}
 	
 	//Init renderer
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	if (renderer == NULL)
-	{
+	if (renderer == NULL) {
 		fprintf(stdout, "Renderer couldn't be created, error %s", SDL_GetError());
 		return false;
 	}
@@ -275,3 +279,4 @@ int main(int argc, const char * argv[])
 	
 	return 0;
 }
+
