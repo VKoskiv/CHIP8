@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8DF400941D4BD71900471BFF /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 8DF400931D4BD71900471BFF /* main.c */; };
 		8DF4009B1D4BD74100471BFF /* SDL2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DF4009A1D4BD74100471BFF /* SDL2.framework */; };
-		8DF4009E1D4BE30D00471BFF /* CPU.c in Sources */ = {isa = PBXBuildFile; fileRef = 8DF4009C1D4BE30D00471BFF /* CPU.c */; };
+		90D315862214E250009491E7 /* CPU.c in Sources */ = {isa = PBXBuildFile; fileRef = 90D315832214E250009491E7 /* CPU.c */; };
+		90D315872214E250009491E7 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 90D315842214E250009491E7 /* main.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,10 +26,10 @@
 
 /* Begin PBXFileReference section */
 		8DF400901D4BD71900471BFF /* CHIP8 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = CHIP8; sourceTree = BUILT_PRODUCTS_DIR; };
-		8DF400931D4BD71900471BFF /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		8DF4009A1D4BD74100471BFF /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../../../../../Library/Frameworks/SDL2.framework; sourceTree = "<group>"; };
-		8DF4009C1D4BE30D00471BFF /* CPU.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CPU.c; sourceTree = "<group>"; };
-		8DF4009D1D4BE30D00471BFF /* CPU.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPU.h; sourceTree = "<group>"; };
+		90D315832214E250009491E7 /* CPU.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = CPU.c; sourceTree = "<group>"; };
+		90D315842214E250009491E7 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		90D315852214E250009491E7 /* CPU.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CPU.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,8 +47,8 @@
 		8DF400871D4BD71900471BFF = {
 			isa = PBXGroup;
 			children = (
+				90D315822214E250009491E7 /* src */,
 				8DF4009A1D4BD74100471BFF /* SDL2.framework */,
-				8DF400921D4BD71900471BFF /* CHIP8 */,
 				8DF400911D4BD71900471BFF /* Products */,
 			);
 			sourceTree = "<group>";
@@ -61,14 +61,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		8DF400921D4BD71900471BFF /* CHIP8 */ = {
+		90D315822214E250009491E7 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				8DF400931D4BD71900471BFF /* main.c */,
-				8DF4009C1D4BE30D00471BFF /* CPU.c */,
-				8DF4009D1D4BE30D00471BFF /* CPU.h */,
+				90D315832214E250009491E7 /* CPU.c */,
+				90D315842214E250009491E7 /* main.c */,
+				90D315852214E250009491E7 /* CPU.h */,
 			);
-			path = CHIP8;
+			path = src;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -127,8 +127,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8DF4009E1D4BE30D00471BFF /* CPU.c in Sources */,
-				8DF400941D4BD71900471BFF /* main.c in Sources */,
+				90D315872214E250009491E7 /* main.c in Sources */,
+				90D315862214E250009491E7 /* CPU.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
