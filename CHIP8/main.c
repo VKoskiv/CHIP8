@@ -10,7 +10,7 @@
 #include "CPU.h"
 #include <time.h>
 
-bool running = true;
+bool emulatorRunning = true;
 
 typedef unsigned char byte;
 
@@ -22,7 +22,7 @@ void sig_handler(int sig)
 {
 	if (sig == SIGINT)
 	{
-		running = false;
+		emulatorRunning = false;
 	}
 	
 }
@@ -221,34 +221,39 @@ int main(int argc, const char * argv[])
 	
 	switch (cpu_load_rom("c8games/BRIX")) {
 		case -1:
-			fprintf(stdout, "Couldn't find the ROM file! (Check working dir/path)\n");
+			fprintf(stderr, "Couldn't find the ROM file! (Check working dir/path)\n");
 			return -1;
 			break;
 		case -2:
-			fprintf(stdout, "ROM too big\n");
+			fprintf(stderr, "ROM too big\n");
 			return -1;
 			break;
 			
 		default:
-			fprintf(stdout, " bytes loaded.\n");
+			fprintf(stderr, " bytes loaded.\n");
 			break;
 	}
 	
 	//Emulation loop
 	do {
-		
+		//Check for CTRL-C
 		if (signal(SIGINT, sig_handler) == SIG_ERR)
-			printf("Couldn't catch SIGINT\n");
-		
+			fprintf(stderr, "Couldn't catch SIGINT\n");
+		//Run the CPU cycle
 		cpu_emulate_cycle();
-		
+		//Draw if needed
 		if (cpu_is_drawflag_set())
 		{
 			render(renderer);
 		}
-		
+		//Check if CPU has halted
+		if (cpu_has_halted())
+		{
+			emulatorRunning = false;
+		}
+		//Set keyboard input to CPU
 		set_input();
-		
+		//Delay
 		struct timespec ts;
 		int ms;
 		
@@ -263,7 +268,7 @@ int main(int argc, const char * argv[])
 		ts.tv_sec = ms / 1000;
 		ts.tv_nsec = (ms % 1000) * 1000000;
 		nanosleep(&ts, NULL);
-	} while (running);
+	} while (emulatorRunning);
 	
 	destroy_renderer(renderer);
 	destroy_window(window);

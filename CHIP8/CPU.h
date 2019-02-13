@@ -15,7 +15,8 @@
 #include <memory.h>
 #include <signal.h>
 
-//CPU debug mode prints a log of opcodes, and enables autohalt
+#define AUTOHALT true
+//CPU debug mode prints a log of opcodes
 #define CPU_DEBUG false
 //If CPU debug and delayEnabled is true, use delayDebug
 #define delayEnabled false
@@ -42,6 +43,9 @@ typedef struct
 	byte display[64 * 32];
 	//Draw flag, set to true if screen needs to be updated
 	bool drawFlag;
+	//Running flag, set to false when an infinite loop is detected.
+	//This isn't standard CHIP-8 behavior, but rather useful.
+	bool running;
 	
 	//No interrupts or hardware registers, only two timer registers that count down to 0 at 60hz
 	byte delay_timer; //Used for delays
@@ -64,6 +68,7 @@ int cpu_load_rom(char *filepath);
 void cpu_emulate_cycle();
 void get_current_frame(char *buf, int count);
 bool cpu_is_drawflag_set();
+bool cpu_has_halted();
 void cpu_set_keys(byte key);
 
 

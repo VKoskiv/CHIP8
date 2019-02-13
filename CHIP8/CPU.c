@@ -45,6 +45,7 @@ void cpu_initialize()
 	mainCPU.I = 0;				//Reset the index register
 	mainCPU.stackPointer = 0;	//Reset the stack pointer
 	mainCPU.drawFlag = false;
+	mainCPU.running = true;
 	
 	//Clear the display
 	for (int i = 0; i < 2048; i++)
@@ -161,9 +162,12 @@ void cpu_emulate_cycle()
 			
 		case 0x1000: // 0x1NNN: Jump to address NNN
 			//Don't increment the program counter because we're jumping to an address
-			//Debug autohalt, automatically hault execution if infinite loop is detected
-			if (CPU_DEBUG && ((mainCPU.progCounter & 0x0FFF) == (mainCPU.currentOP & 0x0FFF)))
-				abort();
+			//Autohalt, automatically hault execution if infinite loop is detected
+			if (AUTOHALT && ((mainCPU.progCounter & 0x0FFF) == (mainCPU.currentOP & 0x0FFF)))
+			{
+				fprintf(stdout, "Infinite loop detected, halting execution.\n");
+				mainCPU.running = false;
+			}
 			mainCPU.progCounter = mainCPU.currentOP & 0x0FFF;
 			break;
 			
@@ -440,6 +444,18 @@ bool cpu_is_drawflag_set()
 	if (mainCPU.drawFlag)
 	{
 		mainCPU.drawFlag = false;
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool cpu_has_halted()
+{
+	if (!mainCPU.running)
+	{
 		return true;
 	}
 	else
