@@ -15,7 +15,7 @@
 #include <memory.h>
 #include <signal.h>
 
-#define AUTOHALT true
+#define AUTOHALT false
 //CPU debug mode prints a log of opcodes
 #define CPU_DEBUG false
 //If CPU debug and delayEnabled is true, use delayDebug
