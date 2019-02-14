@@ -12,8 +12,6 @@
 
 bool emulatorRunning = true;
 
-typedef unsigned char byte;
-
 void (*signal(int signo, void (*func )(int)))(int);
 typedef void sigfunc(int);
 sigfunc *signal(int, sigfunc*);
