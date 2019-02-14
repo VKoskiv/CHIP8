@@ -18,35 +18,26 @@ void (*signal(int signo, void (*func )(int)))(int);
 typedef void sigfunc(int);
 sigfunc *signal(int, sigfunc*);
 
-void sig_handler(int sig)
-{
-	if (sig == SIGINT)
-	{
+void sig_handler(int sig) {
+	if (sig == SIGINT) {
 		emulatorRunning = false;
 	}
-	
 }
 
-void destroy_window(SDL_Window *window)
-{
-	if (window != NULL)
-	{
+void destroy_window(SDL_Window *window) {
+	if (window != NULL) {
 		SDL_DestroyWindow(window);
 	}
 }
 
-void destroy_renderer(SDL_Renderer *renderer)
-{
-	if (renderer != NULL)
-	{
+void destroy_renderer(SDL_Renderer *renderer) {
+	if (renderer != NULL) {
 		SDL_DestroyRenderer(renderer);
 	}
 }
 
-void destroy_texture(SDL_Texture *texture)
-{
-	if (texture != NULL)
-	{
+void destroy_texture(SDL_Texture *texture) {
+	if (texture != NULL) {
 		SDL_DestroyTexture(texture);
 	}
 }
@@ -60,15 +51,11 @@ void render(SDL_Renderer *renderer) {
 	char data[2048] = {0};
 	get_current_frame(data, 2048);
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
-	for (int y = 0; y < 32; ++y)
-	{
-		for (int x = 0; x < 64; ++x)
-		{
-			if (data[(y*64) + x] == 0)
-			{
+	for (int y = 0; y < 32; ++y) {
+		for (int x = 0; x < 64; ++x) {
+			if (data[(y*64) + x] == 0) {
 				//Don't draw ¯\_(ツ)_/¯
-			} else
-			{
+			} else {
 				SDL_RenderDrawPoint(renderer, x, y);
 			}
 		}
@@ -101,8 +88,7 @@ void render(SDL_Renderer *renderer) {
  
  */
 
-void set_input()
-{
+void set_input() {
 	//Get keyboard input, then send that to the CPU
 	
 	SDL_PumpEvents();
@@ -112,68 +98,52 @@ void set_input()
 	//Prevent keys from sticking when pressing more than one at a time
 	cpu_set_keys(0xFF);
 	
-	if (keys[SDL_SCANCODE_1])
-	{
+	if (keys[SDL_SCANCODE_1]) {
 		input = 0x1;
 	}
-	if (keys[SDL_SCANCODE_2])
-	{
+	if (keys[SDL_SCANCODE_2]) {
 		input = 0x2;
 	}
-	if (keys[SDL_SCANCODE_3])
-	{
+	if (keys[SDL_SCANCODE_3]) {
 		input = 0x3;
 	}
-	if (keys[SDL_SCANCODE_4])
-	{
+	if (keys[SDL_SCANCODE_4]) {
 		input = 0xC;
 	}
-	if (keys[SDL_SCANCODE_Q])
-	{
+	if (keys[SDL_SCANCODE_Q]) {
 		input = 0x4;
 	}
-	if (keys[SDL_SCANCODE_W])
-	{
+	if (keys[SDL_SCANCODE_W]) {
 		input = 0x5;
 	}
-	if (keys[SDL_SCANCODE_E])
-	{
+	if (keys[SDL_SCANCODE_E]) {
 		input = 0x6;
 	}
-	if (keys[SDL_SCANCODE_R])
-	{
+	if (keys[SDL_SCANCODE_R]) {
 		input = 0xD;
 	}
-	if (keys[SDL_SCANCODE_A])
-	{
+	if (keys[SDL_SCANCODE_A]) {
 		input = 0x7;
 	}
-	if (keys[SDL_SCANCODE_S])
-	{
+	if (keys[SDL_SCANCODE_S]) {
 		input = 0x8;
 	}
-	if (keys[SDL_SCANCODE_D])
-	{
+	if (keys[SDL_SCANCODE_D]) {
 		input = 0x9;
 	}
-	if (keys[SDL_SCANCODE_F])
-	{
+	if (keys[SDL_SCANCODE_F]) {
 		input = 0xE;
 	}
-	if (keys[SDL_SCANCODE_Z])
-	{
+	if (keys[SDL_SCANCODE_Z]) {
 		input = 0xA;
 	}
-	if (keys[SDL_SCANCODE_X])
-	{
+	if (keys[SDL_SCANCODE_X]) {
 		input = 0x0;
 	}
-	if (keys[SDL_SCANCODE_C])
-	{
+	if (keys[SDL_SCANCODE_C]) {
 		input = 0xB;
 	}
-	if (keys[SDL_SCANCODE_V])
-	{
+	if (keys[SDL_SCANCODE_V]) {
 		input = 0xF;
 	}
 	
@@ -182,8 +152,7 @@ void set_input()
 
 
 
-int main(int argc, const char * argv[])
-{
+int main(int argc, const char * argv[]) {
 	int windowWidth = 64;
 	int windowHeight = 32;
 	int windowScale = 16; //How big the pixels are
@@ -193,8 +162,7 @@ int main(int argc, const char * argv[])
 	
 	
 	//Init SDL
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
-	{
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
 		fprintf(stdout, "SDL couldn't initialize, error %s",SDL_GetError());
 		return false;
 	}
@@ -241,18 +209,17 @@ int main(int argc, const char * argv[])
 	//Emulation loop
 	do {
 		//Check for CTRL-C
-		if (signal(SIGINT, sig_handler) == SIG_ERR)
+		if (signal(SIGINT, sig_handler) == SIG_ERR) {
 			fprintf(stderr, "Couldn't catch SIGINT\n");
+		}
 		//Run the CPU cycle
 		cpu_emulate_cycle();
 		//Draw if needed
-		if (cpu_is_drawflag_set())
-		{
+		if (cpu_is_drawflag_set()) {
 			render(renderer);
 		}
 		//Check if CPU has halted
-		if (cpu_has_halted())
-		{
+		if (cpu_has_halted()) {
 			emulatorRunning = false;
 		}
 		//Set keyboard input to CPU
@@ -261,12 +228,10 @@ int main(int argc, const char * argv[])
 		struct timespec ts;
 		int ms;
 		
-		if (CPU_DEBUG && delayEnabled)
-		{
+		if (CPU_DEBUG && delayEnabled) {
 			ms = delayDebug;
 		}
-		else
-		{
+		else {
 			ms = delayNormal;
 		}
 		ts.tv_sec = ms / 1000;

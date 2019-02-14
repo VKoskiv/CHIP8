@@ -31,8 +31,7 @@ typedef unsigned char byte;
 // 0x050-0x0A0 Used for the built in font set from 0-F
 // 0x200-0xFFF Program ROM and work RAM
 
-typedef struct
-{
+typedef struct {
 	unsigned short currentOP;   //2 bytes
 	byte memory[4096]; //4KB
 	byte V[16];		//Registers, V0 to VE, 1 byte each and VF for flags
