@@ -152,7 +152,7 @@ void set_input() {
 
 
 
-int main(int argc, const char * argv[]) {
+int main(int argc, char *argv[]) {
 	int windowWidth = 64;
 	int windowHeight = 32;
 	int windowScale = 16; //How big the pixels are
@@ -191,19 +191,24 @@ int main(int argc, const char * argv[]) {
 	//Initialize the emulator
 	cpu_initialize();
 	
-	switch (cpu_load_rom("c8games/BRIX")) {
-		case -1:
-			fprintf(stderr, "Couldn't find the ROM file! (Check working dir/path)\n");
-			return -1;
-			break;
-		case -2:
-			fprintf(stderr, "ROM too big\n");
-			return -1;
-			break;
-			
-		default:
-			fprintf(stderr, " bytes loaded.\n");
-			break;
+	if (argc == 2) {
+		switch (cpu_load_rom(argv[1])) {
+			case -1:
+				fprintf(stderr, "Couldn't find the ROM file! (Check working dir/path)\n");
+				return -1;
+				break;
+			case -2:
+				fprintf(stderr, "ROM too big\n");
+				return -1;
+				break;
+				
+			default:
+				fprintf(stderr, " bytes loaded.\n");
+				break;
+		}
+	} else {
+		fprintf(stderr, "Please provide a ROM filepath as argument!\n");
+		return -1;
 	}
 	
 	//Emulation loop
