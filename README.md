@@ -20,7 +20,7 @@ There is also an autohalt feature, which stops the CPU if an infinite loop is de
 
 The controls are mapped as follows:
 
-CHIP8 HEX MAP:
+`CHIP8 HEX MAP:
 +-+-+-+-+
 |1|2|3|C|
 +-+-+-+-+
@@ -40,5 +40,6 @@ HOST KEYBOARD:
 +-+-+-+-+
 |Z|X|C|V|
 +-+-+-+-+
+`
 
 Feel free to send PRs for feature improvements.
