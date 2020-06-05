@@ -230,6 +230,9 @@ int main(int argc, char *argv[]) {
 	int windowHeight = 64;
 	int windowScale = 16; //How big the pixels are
 	
+	//Disable terminal output buffering
+	setbuf(stdout, NULL);
+	
 	SDL_Window *window = NULL;
 	SDL_Renderer *renderer = NULL;
 	
