@@ -10,6 +10,62 @@
 #include "CPU.h"
 #include <time.h>
 
+// THREADING
+#ifdef WINDOWS
+#include <Windows.h>
+#else
+#include <pthread.h>
+#endif
+
+#include <stdbool.h>
+#include <stdint.h>
+
+struct thread {
+#ifdef WINDOWS
+	HANDLE thread_handle;
+	DWORD thread_id;
+#else
+	pthread_t thread_id;
+#endif
+	int thread_num;
+	bool threadComplete;
+	void *(*threadFunc)(void *);
+};
+
+// Multiplatform thread stub
+#ifdef WINDOWS
+DWORD WINAPI threadStub(LPVOID arg) {
+#else
+	void *threadStub(void *arg) {
+#endif
+		return ((struct thread*)arg)->threadFunc(arg);
+	}
+	
+	void checkThread(struct thread *t) {
+#ifdef WINDOWS
+		WaitForSingleObjectEx(t->thread_handle, INFINITE, FALSE);
+#else
+		if (pthread_join(t->thread_id, NULL)) {
+			printf("Thread %i frozen.", t->thread_num);
+		}
+#endif
+	}
+	
+	int startThread(struct thread *t) {
+#ifdef WINDOWS
+		t->thread_handle = CreateThread(NULL, 0, threadStub, t, 0, &t->thread_id);
+		if (t->thread_handle == NULL) return -1;
+		return 0;
+#else
+		pthread_attr_t attribs;
+		pthread_attr_init(&attribs);
+		pthread_attr_setdetachstate(&attribs, PTHREAD_CREATE_JOINABLE);
+		int ret = pthread_create(&t->thread_id, &attribs, threadStub, t);
+		pthread_attr_destroy(&attribs);
+		return ret;
+#endif
+}
+
 bool emulatorRunning = true;
 
 void (*signal(int signo, void (*func )(int)))(int);
@@ -59,6 +115,19 @@ void render(SDL_Renderer *renderer) {
 		}
 	}
 	SDL_RenderPresent(renderer);
+}
+
+void sleepMSec(int ms) {
+#ifdef WINDOWS
+	Sleep(ms);
+#elif __APPLE__
+	struct timespec ts;
+	ts.tv_sec = ms / 1000;
+	ts.tv_nsec = (ms % 1000) * 1000000;
+	nanosleep(&ts, NULL);
+#elif __linux__
+	usleep(ms * 1000);
+#endif
 }
 
 /*
@@ -148,7 +217,13 @@ void set_input() {
 	cpu_set_keys(input);
 }
 
-
+void *decrement_counters(void *none) {
+	while (emulatorRunning) {
+		cpu_decrement_counters();
+		sleepMSec(16);
+	}
+	return NULL;
+}
 
 int main(int argc, char *argv[]) {
 	int windowWidth = 64;
@@ -209,6 +284,12 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 	
+	//Start counter decrement loop.
+	
+	struct thread decrementer = (struct thread){.threadFunc = decrement_counters};
+	
+	startThread(&decrementer);
+	
 	//Emulation loop
 	do {
 		//Check for CTRL-C
@@ -228,7 +309,7 @@ int main(int argc, char *argv[]) {
 		//Set keyboard input to CPU
 		set_input();
 		//Delay
-		struct timespec ts;
+		
 		int ms;
 		
 		if (CPU_DEBUG && delayEnabled) {
@@ -237,9 +318,7 @@ int main(int argc, char *argv[]) {
 		else {
 			ms = delayNormal;
 		}
-		ts.tv_sec = ms / 1000;
-		ts.tv_nsec = (ms % 1000) * 1000000;
-		nanosleep(&ts, NULL);
+		sleepMSec(ms);
 	} while (emulatorRunning);
 	
 	destroy_renderer(renderer);
