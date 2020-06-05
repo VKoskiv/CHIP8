@@ -77,9 +77,7 @@ void cpu_initialize() {
 }
 
 void get_current_frame(char *buf, int count) {
-	for (int i = 0; i < count; ++i) {
-		buf[i] = mainCPU.display[i];
-	}
+	memcpy(buf, mainCPU.display, count);
 }
 
 int cpu_load_rom(char *filepath) {
@@ -123,9 +121,7 @@ void cpu_emulate_cycle() {
 			switch (mainCPU.currentOP & 0x000F) { //Compare the LAST 4 bits
 				case 0x0000: // 0x00E0: Clear the screen
 					//Execute
-					for (int i = 0; i < sizeof(mainCPU.display); i++) {
-						mainCPU.display[i] = 0x0;
-					}
+					memset(mainCPU.display, 0x0, 64 * 32);
 					mainCPU.drawFlag = true;
 					mainCPU.progCounter += 2;
 					break;
