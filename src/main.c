@@ -161,7 +161,7 @@ int main(int argc, char *argv[]) {
 	
 	//Init SDL
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
-		fprintf(stdout, "SDL couldn't initialize, error %s",SDL_GetError());
+		printf("SDL couldn't initialize, error %s",SDL_GetError());
 		return false;
 	}
 	
@@ -174,14 +174,14 @@ int main(int argc, char *argv[]) {
 							  windowWidth * (windowScale/2),
 							  windowHeight * (windowScale/2), flags);
 	if (window == NULL) {
-		fprintf(stdout, "Window couldn't be created, error %s", SDL_GetError());
+		printf("Window couldn't be created, error %s", SDL_GetError());
 		return false;
 	}
 	
 	//Init renderer
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (renderer == NULL) {
-		fprintf(stdout, "Renderer couldn't be created, error %s", SDL_GetError());
+		printf("Renderer couldn't be created, error %s", SDL_GetError());
 		return false;
 	}
 	SDL_RenderSetScale(renderer, windowScale, windowScale);
@@ -192,20 +192,20 @@ int main(int argc, char *argv[]) {
 	if (argc == 2) {
 		switch (cpu_load_rom(argv[1])) {
 			case -1:
-				fprintf(stderr, "Couldn't find the ROM file! (Check working dir/path)\n");
+				printf("Couldn't find the ROM file! (Check working dir/path)\n");
 				return -1;
 				break;
 			case -2:
-				fprintf(stderr, "ROM too big\n");
+				printf("ROM too big\n");
 				return -1;
 				break;
 				
 			default:
-				fprintf(stderr, " bytes loaded.\n");
+				printf(" bytes loaded.\n");
 				break;
 		}
 	} else {
-		fprintf(stderr, "Please provide a ROM filepath as argument!\n");
+		printf("Please provide a ROM filepath as argument!\n");
 		return -1;
 	}
 	
@@ -213,7 +213,7 @@ int main(int argc, char *argv[]) {
 	do {
 		//Check for CTRL-C
 		if (signal(SIGINT, sig_handler) == SIG_ERR) {
-			fprintf(stderr, "Couldn't catch SIGINT\n");
+			printf("Couldn't catch SIGINT\n");
 		}
 		//Run the CPU cycle
 		cpu_emulate_cycle();
