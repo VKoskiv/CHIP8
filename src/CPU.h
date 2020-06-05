@@ -3,7 +3,7 @@
 //  CHIP8
 //
 //  Created by Valtteri Koskivuori on 29/07/16.
-//  Copyright © 2016 Valtteri Koskivuori. All rights reserved.
+//  Copyright © 2016-2020 Valtteri Koskivuori. All rights reserved.
 //
 
 #ifndef CPU_h

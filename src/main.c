@@ -3,7 +3,7 @@
 //  CHIP8
 //
 //  Created by Valtteri Koskivuori on 29/07/16.
-//  Copyright © 2016 Valtteri Koskivuori. All rights reserved.
+//  Copyright © 2016-2020 Valtteri Koskivuori. All rights reserved.
 //
 
 #include <SDL2/SDL.h>
@@ -168,7 +168,7 @@ int main(int argc, char *argv[]) {
 	SDL_WindowFlags flags = SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI;
 	
 	//Init window
-	window = SDL_CreateWindow("CHIP-8 by VKoskiv 2016-2019",
+	window = SDL_CreateWindow("CHIP-8 by VKoskiv 2016-2020",
 							  SDL_WINDOWPOS_UNDEFINED,
 							  SDL_WINDOWPOS_UNDEFINED,
 							  windowWidth * (windowScale/2),
