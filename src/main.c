@@ -226,13 +226,12 @@ void *decrement_counters(void *none) {
 }
 
 int main(int argc, char *argv[]) {
-	int windowWidth = 64;
-	int windowHeight = 32;
+	int windowWidth = 128;
+	int windowHeight = 64;
 	int windowScale = 16; //How big the pixels are
 	
 	SDL_Window *window = NULL;
 	SDL_Renderer *renderer = NULL;
-	
 	
 	//Init SDL
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
@@ -240,7 +239,7 @@ int main(int argc, char *argv[]) {
 		return false;
 	}
 	
-	SDL_WindowFlags flags = SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI;
+	SDL_WindowFlags flags = SDL_WINDOW_SHOWN;
 	
 	//Init window
 	window = SDL_CreateWindow("CHIP-8 by VKoskiv 2016-2020",
