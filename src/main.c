@@ -91,58 +91,58 @@ void set_input() {
 	
 	SDL_PumpEvents();
 	const Uint8 *keys = SDL_GetKeyboardState(NULL);
-	byte input = 0xFF;
+	byte input[16] = {0x0};
 	
 	//Prevent keys from sticking when pressing more than one at a time
-	cpu_set_keys(0xFF);
+	cpu_set_keys(input);
 	
 	if (keys[SDL_SCANCODE_1]) {
-		input = 0x1;
+		input[0x1] = 0x1;
 	}
 	if (keys[SDL_SCANCODE_2]) {
-		input = 0x2;
+		input[0x2] = 0x1;
 	}
 	if (keys[SDL_SCANCODE_3]) {
-		input = 0x3;
+		input[0x3] = 0x1;
 	}
 	if (keys[SDL_SCANCODE_4]) {
-		input = 0xC;
+		input[0xC] = 0x1;
 	}
 	if (keys[SDL_SCANCODE_Q]) {
-		input = 0x4;
+		input[0x4] = 0x1;
 	}
 	if (keys[SDL_SCANCODE_W]) {
-		input = 0x5;
+		input[0x5] = 0x1;
 	}
 	if (keys[SDL_SCANCODE_E]) {
-		input = 0x6;
+		input[0x6] = 0x1;
 	}
 	if (keys[SDL_SCANCODE_R]) {
-		input = 0xD;
+		input[0xD] = 0x1;
 	}
 	if (keys[SDL_SCANCODE_A]) {
-		input = 0x7;
+		input[0x7] = 0x1;
 	}
 	if (keys[SDL_SCANCODE_S]) {
-		input = 0x8;
+		input[0x8] = 0x1;
 	}
 	if (keys[SDL_SCANCODE_D]) {
-		input = 0x9;
+		input[0x9] = 0x1;
 	}
 	if (keys[SDL_SCANCODE_F]) {
-		input = 0xE;
+		input[0xE] = 0x1;
 	}
 	if (keys[SDL_SCANCODE_Z]) {
-		input = 0xA;
+		input[0xA] = 0x1;
 	}
 	if (keys[SDL_SCANCODE_X]) {
-		input = 0x0;
+		input[0x0] = 0x1;
 	}
 	if (keys[SDL_SCANCODE_C]) {
-		input = 0xB;
+		input[0xB] = 0x1;
 	}
 	if (keys[SDL_SCANCODE_V]) {
-		input = 0xF;
+		input[0xF] = 0x1;
 	}
 	
 	cpu_set_keys(input);

@@ -68,7 +68,7 @@ void cpu_emulate_cycle();
 void get_current_frame(char *buf, int count);
 bool cpu_is_drawflag_set();
 bool cpu_has_halted();
-void cpu_set_keys(byte key);
+void cpu_set_keys(byte *keys);
 
 
 #endif /* CPU_h */

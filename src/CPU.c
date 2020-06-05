@@ -419,13 +419,18 @@ bool cpu_has_halted() {
 }
 
 
-void cpu_set_keys(byte key) {
-	if (key == 0xFF) {
-		for (int i = 0; i < 16; i++) {
-			mainCPU.key[i] = 0;
-		}
-	} else {
-		mainCPU.key[key] = 1;
+void cpu_set_keys(byte *keys) {
+	memcpy(mainCPU.key, keys, 16);
+}
+
+void cpu_decrement_counters() {
+	if (mainCPU.delay_timer != 0) {
+		mainCPU.delay_timer--;
+	}
+	if (mainCPU.sound_timer != 0) {
+		if (mainCPU.sound_timer == 1)
+			printf("BEEP!\n"); //TODO: Make this beep :D
+		mainCPU.sound_timer--;
 	}
 }
 
